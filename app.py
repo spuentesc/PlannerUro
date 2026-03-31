@@ -45,6 +45,12 @@ st.markdown(
         color: #1f2937 !important;
         letter-spacing: -0.02em;
     }
+
+    /* Stronger visibility for subtitles and labels */
+    p, label, .small-note {
+        color: #475569 !important;
+    }
+
     div[data-testid="stMetric"] {
         background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
         border: 1px solid #eadbce;
@@ -88,7 +94,7 @@ st.markdown(
         font-weight: 700 !important;
     }
 
-    /* Inputs/selects/multiselects: remove dark theme feeling */
+    /* Inputs/selects/multiselects */
     div[data-baseweb="select"] > div,
     div[data-baseweb="base-input"] > div,
     div[data-testid="stTextInputRootElement"] > div,
@@ -107,14 +113,31 @@ st.markdown(
     div[data-testid="stDateInputField"] input {
         color: #1f2937 !important;
     }
+
+    /* Pastel tags for multiselect/filter chips */
     div[data-baseweb="tag"] {
-        background: #f28482 !important;
-        color: white !important;
-        border-radius: 10px !important;
-    }
-    div[data-baseweb="popover"] {
-        background: #fffdfb !important;
         color: #1f2937 !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
+    div[data-baseweb="tag"]:nth-of-type(5n+1) {
+        background: #fbf8cc !important;
+    }
+    div[data-baseweb="tag"]:nth-of-type(5n+2) {
+        background: #fde4cf !important;
+    }
+    div[data-baseweb="tag"]:nth-of-type(5n+3) {
+        background: #ffcfd2 !important;
+    }
+    div[data-baseweb="tag"]:nth-of-type(5n+4) {
+        background: #a3c4f3 !important;
+    }
+    div[data-baseweb="tag"]:nth-of-type(5n+5) {
+        background: #b9fbc0 !important;
+    }
+    div[data-baseweb="tag"] span, div[data-baseweb="tag"] svg {
+        color: #1f2937 !important;
+        fill: #1f2937 !important;
     }
 
     .status-pill {
@@ -127,7 +150,6 @@ st.markdown(
         margin-right: 0.35rem;
     }
     .small-note {
-        color: #475569;
         font-size: 0.92rem;
     }
     .roadmap-card {
@@ -262,7 +284,7 @@ def fix_plotly_axes(fig):
     )
     return fig
 
-def make_styled_table(df, project_col=None):
+def make_styled_table(df, project_col=None, font_size="12px"):
     def row_style(row):
         if project_col and project_col in row.index:
             base = PROJECT_LIGHT.get(row[project_col], "#fffdfb")
@@ -277,15 +299,22 @@ def make_styled_table(df, project_col=None):
                 ("color", "#1f2937"),
                 ("font-weight", "700"),
                 ("border", "1px solid #eadbce"),
-                ("padding", "8px 10px"),
+                ("padding", "6px 8px"),
+                ("font-size", font_size),
+                ("white-space", "normal"),
+                ("word-break", "break-word"),
             ],
         },
         {
             "selector": "td",
             "props": [
                 ("border", "1px solid #f0e6df"),
-                ("padding", "7px 10px"),
+                ("padding", "6px 8px"),
                 ("color", "#1f2937"),
+                ("font-size", font_size),
+                ("white-space", "normal"),
+                ("word-break", "break-word"),
+                ("vertical-align", "top"),
             ],
         },
         {
@@ -295,6 +324,7 @@ def make_styled_table(df, project_col=None):
                 ("border-radius", "12px"),
                 ("overflow", "hidden"),
                 ("width", "100%"),
+                ("table-layout", "fixed"),
             ],
         },
     ]
@@ -403,7 +433,7 @@ with tab1:
             st.markdown("**Milestones**")
             milestone_view = milestones.dropna(subset=["Date"]).copy()
             milestone_view["Date"] = pd.to_datetime(milestone_view["Date"], errors="coerce").dt.strftime("%b %d")
-            st.table(make_styled_table(milestone_view))
+            st.table(make_styled_table(milestone_view, font_size="11px"))
         with c2:
             st.markdown("**Tasks by project / prototype**")
             proto_summary = (
@@ -415,7 +445,7 @@ with tab1:
             proto_summary["Start"] = pd.to_datetime(proto_summary["Start"], errors="coerce").dt.strftime("%b %d")
             proto_summary["End"] = pd.to_datetime(proto_summary["End"], errors="coerce").dt.strftime("%b %d")
             proto_summary["AvgProgress"] = proto_summary["AvgProgress"].round(1).astype(str) + "%"
-            st.table(make_styled_table(proto_summary, project_col="Project"))
+            st.table(make_styled_table(proto_summary, project_col="Project", font_size="11px"))
 
 with tab2:
     st.subheader("Roadmap by week")
@@ -447,24 +477,23 @@ with tab2:
                     unsafe_allow_html=True,
                 )
 
-                col_a, col_b, col_c = st.columns([1.2, 1.2, 2.8])
+                col_a, col_b, col_c = st.columns([1.1, 1.1, 2.4])
 
                 by_proj = wk_tasks.groupby("Project").size().reset_index(name="Tasks")
-                figp = px.bar(by_proj, x="Project", y="Tasks", text="Tasks", color="Project", color_discrete_map=PROJECT_COLORS, height=250)
+                figp = px.bar(by_proj, x="Project", y="Tasks", text="Tasks", color="Project", color_discrete_map=PROJECT_COLORS, height=240)
                 figp.update_layout(margin=dict(l=10,r=10,t=20,b=10), showlegend=False, xaxis_title="", yaxis_title="")
                 figp.update_traces(textposition="outside")
                 col_a.plotly_chart(fix_plotly_axes(figp), use_container_width=True)
 
                 by_stat = wk_tasks.groupby("Status").size().reset_index(name="Tasks")
-                figs = px.bar(by_stat, x="Status", y="Tasks", text="Tasks", color="Status", color_discrete_map=STATUS_COLORS, height=250)
+                figs = px.bar(by_stat, x="Status", y="Tasks", text="Tasks", color="Status", color_discrete_map=STATUS_COLORS, height=240)
                 figs.update_layout(margin=dict(l=10,r=10,t=20,b=10), showlegend=False, xaxis_title="", yaxis_title="")
                 figs.update_traces(textposition="outside")
                 col_b.plotly_chart(fix_plotly_axes(figs), use_container_width=True)
 
-                detail_cols = ["Project", "Prototype", "Task", "OwnersLabel", "Status", "Progress"]
-                wk_show = wk_tasks[detail_cols].sort_values(["Project", "Prototype", "Task"]).copy()
+                wk_show = wk_tasks[["Project", "Prototype", "Task", "Status", "Progress"]].sort_values(["Project", "Prototype", "Task"]).copy()
                 wk_show["Progress"] = wk_show["Progress"].round(0).astype(int).astype(str) + "%"
-                col_c.table(make_styled_table(wk_show, project_col="Project"))
+                col_c.table(make_styled_table(wk_show, project_col="Project", font_size="10px"))
 
             st.markdown("### Focus week details")
             focus_start = pd.to_datetime(chosen_week + ", 2026", format="%b %d, %Y")
@@ -527,7 +556,7 @@ with tab3:
             overdue_df["EndDate"] = pd.to_datetime(overdue_df["EndDate"], errors="coerce").dt.strftime("%b %d")
             overdue_df["Progress"] = overdue_df["Progress"].round(0).astype(int).astype(str) + "%"
             overdue_show = overdue_df[["Project", "Prototype", "Task", "OwnersLabel", "EndDate", "Status", "Progress"]]
-            st.table(make_styled_table(overdue_show, project_col="Project"))
+            st.table(make_styled_table(overdue_show, project_col="Project", font_size="11px"))
 
 with tab4:
     st.subheader("Tasks table")
@@ -538,19 +567,19 @@ with tab4:
     table_df["StartDate"] = pd.to_datetime(table_df["StartDate"], errors="coerce").dt.strftime("%b %d")
     table_df["EndDate"] = pd.to_datetime(table_df["EndDate"], errors="coerce").dt.strftime("%b %d")
     table_df["Progress"] = table_df["Progress"].round(0).astype(int).astype(str) + "%"
-    st.table(make_styled_table(table_df, project_col="Project"))
+    st.table(make_styled_table(table_df, project_col="Project", font_size="10px"))
 
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("**Project slice**")
         project_focus = st.selectbox("View one project", ["All"] + project_options, index=0)
         if project_focus != "All":
-            st.table(make_styled_table(table_df[table_df["Project"] == project_focus], project_col="Project"))
+            st.table(make_styled_table(table_df[table_df["Project"] == project_focus], project_col="Project", font_size="10px"))
     with c2:
         st.markdown("**Prototype slice**")
         prototype_focus = st.selectbox("View one prototype", ["All"] + prototype_options, index=0)
         if prototype_focus != "All":
-            st.table(make_styled_table(table_df[table_df["Prototype"] == prototype_focus], project_col="Project"))
+            st.table(make_styled_table(table_df[table_df["Prototype"] == prototype_focus], project_col="Project", font_size="10px"))
 
 with tab5:
     st.subheader("Task editor")
@@ -601,7 +630,7 @@ with tab5:
             st.success("Task updated successfully.")
 
     st.markdown("### Add a manual mini-task")
-    with st.form("manual_task_form_v8"):
+    with st.form("manual_task_form_v9"):
         c1, c2, c3 = st.columns(3)
         project = c1.selectbox("Project", project_options)
         prototype = c2.selectbox("Prototype", prototype_options)
@@ -611,8 +640,8 @@ with tab5:
         task_name = st.text_input("Task name")
         owners = st.multiselect("Owners", people_options)
         d1, d2, d3 = st.columns(3)
-        start = d1.date_input("Start date", key="manual_start_v8")
-        end = d2.date_input("End date", key="manual_end_v8")
+        start = d1.date_input("Start date", key="manual_start_v9")
+        end = d2.date_input("End date", key="manual_end_v9")
         status = d3.selectbox("Initial status", STATUS_OPTIONS)
         weekly_update = st.text_input("Weekly update")
         notes = st.text_area("Notes")
@@ -664,4 +693,5 @@ with tab6:
         k2.metric("Completed", int((week_tasks["Status"] == "Done").sum()))
         k3.metric("Average progress", f"{round(report_df[(report_df['StartDate'] <= week_end) & (report_df['EndDate'] >= week_start)]['Progress'].mean() if len(week_tasks) else 0, 1)}%")
 
-        st.table(make_styled_table(week_tasks[["Project", "Prototype", "Task", "OwnersLabel", "StartDate", "EndDate", "Status", "Progress", "WeeklyUpdate", "Notes"]], project_col="Project"))
+        week_show = week_tasks[["Project", "Prototype", "Task", "OwnersLabel", "StartDate", "EndDate", "Status", "Progress", "WeeklyUpdate", "Notes"]]
+        st.table(make_styled_table(week_show, project_col="Project", font_size="10px"))
