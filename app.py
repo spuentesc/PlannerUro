@@ -18,7 +18,8 @@ PEOPLE_PATH = DATA_DIR / "people.csv"
 APP_PALETTE = ["#f6bd60", "#f7ede2", "#f5cac3", "#84a59d", "#f28482"]
 CHART_PALETTE = ["#fbf8cc", "#fde4cf", "#ffcfd2", "#f1c0e8", "#cfbaf0", "#a3c4f3", "#90dbf4", "#8eecf5", "#98f5e1", "#b9fbc0"]
 
-PROJECT_COLORS = {"Trocasense": "#c97b10", "Urosim": "#2f7f77", "General": "#c95c5c"}
+PROJECT_COLORS = {"Trocasense": "#f6bd60", "Urosim": "#84a59d", "General": "#f28482"}
+PROJECT_LIGHT = {"Trocasense": "#fff4dd", "Urosim": "#eef8f6", "General": "#fff0f0"}
 STATUS_COLORS = {"Not Started": "#dc2626", "In Progress": "#d97706", "Blocked": "#7c3aed", "Done": "#16a34a"}
 
 STATUS_OPTIONS = ["Not Started", "In Progress", "Blocked", "Done"]
@@ -55,6 +56,8 @@ st.markdown(
         color: #1f2937 !important;
         opacity: 1 !important;
     }
+
+    /* Tabs */
     div[data-baseweb="tab-list"] {
         gap: 0.35rem;
         border-bottom: 1px solid #eadbce;
@@ -84,6 +87,36 @@ st.markdown(
         color: #b45309 !important;
         font-weight: 700 !important;
     }
+
+    /* Inputs/selects/multiselects: remove dark theme feeling */
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="base-input"] > div,
+    div[data-testid="stTextInputRootElement"] > div,
+    div[data-testid="stDateInputField"] > div,
+    div[data-testid="stNumberInput"] > div,
+    div[data-testid="stTextArea"] textarea {
+        background: #fffdfb !important;
+        color: #1f2937 !important;
+        border: 1px solid #eadbce !important;
+        border-radius: 14px !important;
+    }
+    div[data-baseweb="select"] span,
+    div[data-baseweb="select"] input,
+    div[data-baseweb="base-input"] input,
+    div[data-testid="stTextArea"] textarea,
+    div[data-testid="stDateInputField"] input {
+        color: #1f2937 !important;
+    }
+    div[data-baseweb="tag"] {
+        background: #f28482 !important;
+        color: white !important;
+        border-radius: 10px !important;
+    }
+    div[data-baseweb="popover"] {
+        background: #fffdfb !important;
+        color: #1f2937 !important;
+    }
+
     .status-pill {
         display: inline-block;
         padding: 0.18rem 0.62rem;
@@ -229,17 +262,43 @@ def fix_plotly_axes(fig):
     )
     return fig
 
-def format_short_date(series):
-    s = pd.to_datetime(series, errors="coerce")
-    return s.dt.strftime("%b %-d") if hasattr(s.dt, "strftime") else s
+def make_styled_table(df, project_col=None):
+    def row_style(row):
+        if project_col and project_col in row.index:
+            base = PROJECT_LIGHT.get(row[project_col], "#fffdfb")
+            return [f"background-color: {base}; color: #1f2937;"] * len(row)
+        return ["background-color: #fffdfb; color: #1f2937;"] * len(row)
 
-def pretty_table(df, date_cols=None):
-    out = df.copy()
-    date_cols = date_cols or []
-    for col in date_cols:
-        if col in out.columns:
-            out[col] = pd.to_datetime(out[col], errors="coerce").dt.strftime("%b %d")
-    return out
+    styles = [
+        {
+            "selector": "th",
+            "props": [
+                ("background-color", "#f7ede2"),
+                ("color", "#1f2937"),
+                ("font-weight", "700"),
+                ("border", "1px solid #eadbce"),
+                ("padding", "8px 10px"),
+            ],
+        },
+        {
+            "selector": "td",
+            "props": [
+                ("border", "1px solid #f0e6df"),
+                ("padding", "7px 10px"),
+                ("color", "#1f2937"),
+            ],
+        },
+        {
+            "selector": "table",
+            "props": [
+                ("border-collapse", "collapse"),
+                ("border-radius", "12px"),
+                ("overflow", "hidden"),
+                ("width", "100%"),
+            ],
+        },
+    ]
+    return df.style.apply(row_style, axis=1).set_table_styles(styles)
 
 prototypes, milestones, templates, people_df = load_static()
 tasks = load_tasks()
@@ -302,7 +361,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 
 with tab1:
     st.subheader("Master timeline")
-    st.markdown('<div class="small-note">Readable timeline plus lighter, cleaner summary tables.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="small-note">Readable timeline plus lighter, project-colored summary tables.</div>', unsafe_allow_html=True)
 
     timeline_df = filtered.dropna(subset=["StartDate", "EndDate"]).copy()
     if not timeline_df.empty:
@@ -344,15 +403,7 @@ with tab1:
             st.markdown("**Milestones**")
             milestone_view = milestones.dropna(subset=["Date"]).copy()
             milestone_view["Date"] = pd.to_datetime(milestone_view["Date"], errors="coerce").dt.strftime("%b %d")
-            st.dataframe(
-                milestone_view,
-                use_container_width=True,
-                hide_index=True,
-                column_config={
-                    "Date": st.column_config.TextColumn("Date"),
-                    "Label": st.column_config.TextColumn("Label"),
-                },
-            )
+            st.table(make_styled_table(milestone_view))
         with c2:
             st.markdown("**Tasks by project / prototype**")
             proto_summary = (
@@ -364,19 +415,7 @@ with tab1:
             proto_summary["Start"] = pd.to_datetime(proto_summary["Start"], errors="coerce").dt.strftime("%b %d")
             proto_summary["End"] = pd.to_datetime(proto_summary["End"], errors="coerce").dt.strftime("%b %d")
             proto_summary["AvgProgress"] = proto_summary["AvgProgress"].round(1).astype(str) + "%"
-            st.dataframe(
-                proto_summary,
-                use_container_width=True,
-                hide_index=True,
-                column_config={
-                    "Project": st.column_config.TextColumn("Project"),
-                    "Prototype": st.column_config.TextColumn("Prototype"),
-                    "Start": st.column_config.TextColumn("Start"),
-                    "End": st.column_config.TextColumn("End"),
-                    "Tasks": st.column_config.NumberColumn("Tasks"),
-                    "AvgProgress": st.column_config.TextColumn("Avg progress"),
-                },
-            )
+            st.table(make_styled_table(proto_summary, project_col="Project"))
 
 with tab2:
     st.subheader("Roadmap by week")
@@ -425,7 +464,7 @@ with tab2:
                 detail_cols = ["Project", "Prototype", "Task", "OwnersLabel", "Status", "Progress"]
                 wk_show = wk_tasks[detail_cols].sort_values(["Project", "Prototype", "Task"]).copy()
                 wk_show["Progress"] = wk_show["Progress"].round(0).astype(int).astype(str) + "%"
-                col_c.dataframe(wk_show, use_container_width=True, hide_index=True)
+                col_c.table(make_styled_table(wk_show, project_col="Project"))
 
             st.markdown("### Focus week details")
             focus_start = pd.to_datetime(chosen_week + ", 2026", format="%b %d, %Y")
@@ -487,7 +526,8 @@ with tab3:
         else:
             overdue_df["EndDate"] = pd.to_datetime(overdue_df["EndDate"], errors="coerce").dt.strftime("%b %d")
             overdue_df["Progress"] = overdue_df["Progress"].round(0).astype(int).astype(str) + "%"
-            st.dataframe(overdue_df[["Project", "Prototype", "Task", "OwnersLabel", "EndDate", "Status", "Progress"]], use_container_width=True, hide_index=True)
+            overdue_show = overdue_df[["Project", "Prototype", "Task", "OwnersLabel", "EndDate", "Status", "Progress"]]
+            st.table(make_styled_table(overdue_show, project_col="Project"))
 
 with tab4:
     st.subheader("Tasks table")
@@ -498,19 +538,19 @@ with tab4:
     table_df["StartDate"] = pd.to_datetime(table_df["StartDate"], errors="coerce").dt.strftime("%b %d")
     table_df["EndDate"] = pd.to_datetime(table_df["EndDate"], errors="coerce").dt.strftime("%b %d")
     table_df["Progress"] = table_df["Progress"].round(0).astype(int).astype(str) + "%"
-    st.dataframe(table_df, use_container_width=True, hide_index=True)
+    st.table(make_styled_table(table_df, project_col="Project"))
 
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("**Project slice**")
         project_focus = st.selectbox("View one project", ["All"] + project_options, index=0)
         if project_focus != "All":
-            st.dataframe(table_df[table_df["Project"] == project_focus], use_container_width=True, hide_index=True)
+            st.table(make_styled_table(table_df[table_df["Project"] == project_focus], project_col="Project"))
     with c2:
         st.markdown("**Prototype slice**")
         prototype_focus = st.selectbox("View one prototype", ["All"] + prototype_options, index=0)
         if prototype_focus != "All":
-            st.dataframe(table_df[table_df["Prototype"] == prototype_focus], use_container_width=True, hide_index=True)
+            st.table(make_styled_table(table_df[table_df["Prototype"] == prototype_focus], project_col="Project"))
 
 with tab5:
     st.subheader("Task editor")
@@ -561,7 +601,7 @@ with tab5:
             st.success("Task updated successfully.")
 
     st.markdown("### Add a manual mini-task")
-    with st.form("manual_task_form_v7"):
+    with st.form("manual_task_form_v8"):
         c1, c2, c3 = st.columns(3)
         project = c1.selectbox("Project", project_options)
         prototype = c2.selectbox("Prototype", prototype_options)
@@ -571,8 +611,8 @@ with tab5:
         task_name = st.text_input("Task name")
         owners = st.multiselect("Owners", people_options)
         d1, d2, d3 = st.columns(3)
-        start = d1.date_input("Start date", key="manual_start_v7")
-        end = d2.date_input("End date", key="manual_end_v7")
+        start = d1.date_input("Start date", key="manual_start_v8")
+        end = d2.date_input("End date", key="manual_end_v8")
         status = d3.selectbox("Initial status", STATUS_OPTIONS)
         weekly_update = st.text_input("Weekly update")
         notes = st.text_area("Notes")
@@ -624,9 +664,4 @@ with tab6:
         k2.metric("Completed", int((week_tasks["Status"] == "Done").sum()))
         k3.metric("Average progress", f"{round(report_df[(report_df['StartDate'] <= week_end) & (report_df['EndDate'] >= week_start)]['Progress'].mean() if len(week_tasks) else 0, 1)}%")
 
-        st.dataframe(
-            week_tasks[["Project", "Prototype", "Task", "OwnersLabel", "StartDate", "EndDate", "Status", "Progress", "WeeklyUpdate", "Notes"]],
-            use_container_width=True,
-            hide_index=True,
-        )
-
+        st.table(make_styled_table(week_tasks[["Project", "Prototype", "Task", "OwnersLabel", "StartDate", "EndDate", "Status", "Progress", "WeeklyUpdate", "Notes"]], project_col="Project"))
