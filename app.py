@@ -18,51 +18,124 @@ PEOPLE_PATH = DATA_DIR / "people.csv"
 
 APP_PALETTE = ["#f6bd60", "#f7ede2", "#f5cac3", "#84a59d", "#f28482"]
 CHART_PALETTE = ["#fbf8cc", "#fde4cf", "#ffcfd2", "#f1c0e8", "#cfbaf0", "#a3c4f3", "#90dbf4", "#8eecf5", "#98f5e1", "#b9fbc0"]
-PROJECT_COLORS = {"Trocasense": "#e89b2d", "Urosim": "#4f8f87", "General": "#d96c6c"}
+
+PROJECT_COLORS = {"Trocasense": "#c97b10", "Urosim": "#2f7f77", "General": "#c95c5c"}
 STATUS_COLORS = {"Not Started": "#dc2626", "In Progress": "#d97706", "Blocked": "#7c3aed", "Done": "#16a34a"}
+
 STATUS_OPTIONS = ["Not Started", "In Progress", "Blocked", "Done"]
 PRIORITY_OPTIONS = ["Low", "Medium", "High", "Critical"]
+
 
 st.markdown(
     """
     <style>
-    .stApp { background-color: white; color: #24323d; }
-    .block-container { padding-top: 1.2rem; padding-bottom: 2rem; max-width: 1500px; }
-    h1, h2, h3 { color: #24323d; }
-    section[data-testid="stSidebar"] { background-color: #f7ede2; }
+    .stApp {
+        background: white;
+        color: #1f2937;
+    }
+    .block-container {
+        max-width: 1550px;
+        padding-top: 1.0rem;
+        padding-bottom: 2rem;
+    }
+    section[data-testid="stSidebar"] {
+        background: #f7ede2;
+        border-right: 1px solid #eadbce;
+    }
+    h1, h2, h3 {
+        color: #1f2937 !important;
+        letter-spacing: -0.02em;
+    }
     div[data-testid="stMetric"] {
         background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
-        border: 1px solid #efdfd2;
-        border-radius: 18px;
-        padding: 0.8rem 1rem;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-    }
-    div[data-testid="stMetric"] label, div[data-testid="stMetric"] [data-testid="stMetricLabel"] {
-        color: #5d6b74 !important;
-        opacity: 1 !important;
-        font-weight: 600;
-    }
-    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-        color: #24323d !important;
-        opacity: 1 !important;
-        font-weight: 700;
-    }
-    .section-card {
-        background: #ffffff;
-        border: 1px solid #f0e2d6;
+        border: 1px solid #eadbce;
         border-radius: 18px;
         padding: 0.9rem 1rem;
-        margin-bottom: 1rem;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.05);
     }
-    .tiny-note { color: #64748b; font-size: 0.92rem; }
-    .legend-chip {
-        display: inline-block; padding: 0.18rem 0.65rem; border-radius: 999px; 
-        color: white; font-size: 0.82rem; margin-right: 0.35rem; font-weight: 600;
+    div[data-testid="stMetricLabel"], div[data-testid="stMetricValue"] {
+        color: #1f2937 !important;
+        opacity: 1 !important;
+    }
+    div[data-baseweb="tab-list"] {
+        gap: 0.35rem;
+        border-bottom: 1px solid #eadbce;
+        margin-bottom: 0.6rem;
+    }
+    button[data-baseweb="tab"] {
+        background: #f7ede2 !important;
+        border: 1px solid #eadbce !important;
+        border-bottom: none !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 0.55rem 1rem !important;
+    }
+    button[data-baseweb="tab"] p {
+        color: #334155 !important;
+        font-weight: 600 !important;
+        font-size: 0.96rem !important;
+    }
+    button[data-baseweb="tab"]:hover {
+        background: #f5cac3 !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: white !important;
+        border: 1px solid #e89b2d !important;
+        border-bottom: 3px solid #e89b2d !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] p {
+        color: #b45309 !important;
+        font-weight: 700 !important;
+    }
+    .status-pill {
+        display: inline-block;
+        padding: 0.18rem 0.62rem;
+        border-radius: 999px;
+        color: white;
+        font-weight: 700;
+        font-size: 0.82rem;
+        margin-right: 0.35rem;
+    }
+    .soft-card {
+        background: #fffdfb;
+        border: 1px solid #eadbce;
+        border-radius: 20px;
+        padding: 1rem 1rem 0.9rem 1rem;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.04);
+        margin-bottom: 0.8rem;
+    }
+    .small-note {
+        color: #475569;
+        font-size: 0.92rem;
+    }
+    .roadmap-card {
+        border: 1px solid #eadbce;
+        border-radius: 18px;
+        background: #fffdfb;
+        padding: 0.85rem 0.95rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        margin-bottom: 0.75rem;
+    }
+    .roadmap-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+    .roadmap-sub {
+        font-size: 0.88rem;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+    }
+    .roadmap-line {
+        font-size: 0.92rem;
+        color: #334155;
+        margin-bottom: 0.18rem;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
 
 def parse_json_list(value):
     if isinstance(value, list):
@@ -77,13 +150,16 @@ def parse_json_list(value):
         pass
     return [v.strip() for v in str(value).split(",") if v.strip()]
 
+
 def dump_json_list(value):
     if isinstance(value, list):
         return json.dumps(value, ensure_ascii=False)
     return json.dumps(parse_json_list(value), ensure_ascii=False)
 
+
 def read_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path) if path.exists() else pd.DataFrame()
+
 
 @st.cache_data
 def load_static():
@@ -91,10 +167,13 @@ def load_static():
     milestones = read_csv(MILESTONES_PATH)
     templates = read_csv(TEMPLATES_PATH)
     people = read_csv(PEOPLE_PATH)
+
     if "DefaultOwners" in prototypes.columns:
         prototypes["DefaultOwners"] = prototypes["DefaultOwners"].apply(parse_json_list)
+
     milestones["Date"] = pd.to_datetime(milestones["Date"], errors="coerce")
     return prototypes, milestones, templates, people
+
 
 def load_tasks():
     df = read_csv(TASKS_PATH)
@@ -106,6 +185,7 @@ def load_tasks():
     for col in required:
         if col not in df.columns:
             df[col] = ""
+
     df["Owners"] = df["Owners"].apply(parse_json_list)
     df["StartDate"] = pd.to_datetime(df["StartDate"], errors="coerce")
     df["EndDate"] = pd.to_datetime(df["EndDate"], errors="coerce")
@@ -116,12 +196,14 @@ def load_tasks():
     df["PinnedWeek1"] = df["PinnedWeek1"].astype(str).str.lower().isin(["true", "1", "yes"])
     return df
 
+
 def save_tasks(df):
     out = df.copy()
     out["Owners"] = out["Owners"].apply(dump_json_list)
     out["StartDate"] = pd.to_datetime(out["StartDate"], errors="coerce").dt.strftime("%Y-%m-%d")
     out["EndDate"] = pd.to_datetime(out["EndDate"], errors="coerce").dt.strftime("%Y-%m-%d")
     out.to_csv(TASKS_PATH, index=False)
+
 
 def compute_duration_days(start, end):
     start = pd.to_datetime(start, errors="coerce")
@@ -130,13 +212,13 @@ def compute_duration_days(start, end):
         return 0
     return max((end - start).days + 1, 0)
 
+
 def wrap_label(text, max_len=34):
     txt = str(text)
     if len(txt) <= max_len:
         return txt
     words = txt.split()
-    lines = []
-    cur = ""
+    lines, cur = [], ""
     for w in words:
         cand = (cur + " " + w).strip()
         if len(cand) <= max_len:
@@ -149,11 +231,17 @@ def wrap_label(text, max_len=34):
         lines.append(cur)
     return "<br>".join(lines)
 
+
+def status_pill(status: str):
+    color = STATUS_COLORS.get(status, "#64748b")
+    return f'<span class="status-pill" style="background:{color};">{status}</span>'
+
+
 prototypes, milestones, templates, people_df = load_static()
 tasks = load_tasks()
 
 tasks["OwnersLabel"] = tasks["Owners"].apply(lambda x: ", ".join(x))
-tasks["DisplayTask"] = tasks.apply(lambda r: f"{r['Prototype']} • {r['Task']}", axis=1)
+tasks["Overdue"] = tasks["EndDate"].notna() & (tasks["EndDate"] < pd.Timestamp.today().normalize()) & (tasks["Status"] != "Done")
 
 people_options = people_df["Person"].dropna().astype(str).tolist()
 project_options = sorted(tasks["Project"].dropna().astype(str).unique().tolist())
@@ -165,12 +253,9 @@ with st.sidebar:
     selected_prototypes = st.multiselect("Prototype", prototype_options, default=prototype_options)
     selected_people = st.multiselect("Owner", people_options, default=people_options)
     selected_status = st.multiselect("Status", STATUS_OPTIONS, default=STATUS_OPTIONS)
-    timeline_color_mode = st.radio("Timeline colors", ["Project", "Status"], index=0)
+    color_mode = st.radio("Timeline colors", ["Project", "Status"], index=0)
     only_manual = st.checkbox("Only manual tasks", value=False)
     only_overdue = st.checkbox("Only overdue", value=False)
-
-today = pd.Timestamp.today().normalize()
-tasks["Overdue"] = tasks["EndDate"].notna() & (tasks["EndDate"] < today) & (tasks["Status"] != "Done")
 
 filtered = tasks.copy()
 if selected_projects:
@@ -187,7 +272,7 @@ if only_overdue:
     filtered = filtered[filtered["Overdue"]]
 
 st.title("Urosim / Trocasense Planner")
-st.caption("Project planner with the full schedule preloaded from March 31 to May 27, editable task records, and a safer cloud-friendly editor.")
+st.caption("Product-style planner with timeline, roadmap by week, clean task views, and single-task editing.")
 
 m1, m2, m3, m4, m5 = st.columns(5)
 m1.metric("Total tasks", int(len(filtered)))
@@ -198,28 +283,31 @@ m5.metric("Average progress", f"{round(filtered['Progress'].mean() if len(filter
 
 st.markdown(
     f"""
-    <div style="margin:0.35rem 0 0.9rem 0;">
-      <span class="legend-chip" style="background:{STATUS_COLORS['Not Started']};">Not Started</span>
-      <span class="legend-chip" style="background:{STATUS_COLORS['In Progress']};">In Progress</span>
-      <span class="legend-chip" style="background:{STATUS_COLORS['Done']};">Done</span>
+    <div style="margin:0.3rem 0 1rem 0;">
+      {status_pill("Not Started")}
+      {status_pill("In Progress")}
+      {status_pill("Done")}
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Master timeline", "Dashboard", "Task editor", "Weekly report", "Reference tables"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "Master timeline", "Roadmap by week", "Dashboard", "Tasks table", "Task editor", "Weekly report"
+])
 
 with tab1:
     st.subheader("Master timeline")
-    st.markdown('<div class="tiny-note">This chart uses larger labels, horizontal bars, and a simplified milestone display so the schedule is easier to read.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="small-note">This timeline keeps labels horizontal and readable, with milestones listed in a table below instead of angled text over the chart.</div>', unsafe_allow_html=True)
 
     timeline_df = filtered.dropna(subset=["StartDate", "EndDate"]).copy()
     if not timeline_df.empty:
         timeline_df = timeline_df.sort_values(["Project", "Prototype", "StartDate", "Task"]).copy()
-        timeline_df["TaskLabel"] = timeline_df.apply(lambda r: wrap_label(f"{r['Prototype']} • {r['Task']}", 36), axis=1)
+        timeline_df["TaskLabel"] = timeline_df.apply(lambda r: wrap_label(f"{r['Prototype']} • {r['Task']}", 40), axis=1)
 
-        color_col = "Project" if timeline_color_mode == "Project" else "Status"
+        color_col = "Project" if color_mode == "Project" else "Status"
         color_map = PROJECT_COLORS if color_col == "Project" else STATUS_COLORS
+
         fig = px.timeline(
             timeline_df,
             x_start="StartDate",
@@ -228,79 +316,214 @@ with tab1:
             color=color_col,
             color_discrete_map=color_map,
             hover_data=["Project", "Prototype", "Stage", "OwnersLabel", "Status", "Progress", "Notes"],
-            height=max(700, 24 * len(timeline_df) + 220),
+            height=max(750, 28 * len(timeline_df) + 240),
         )
-        fig.update_yaxes(autorange="reversed", tickfont=dict(size=12))
-        fig.update_xaxes(tickangle=0, tickfont=dict(size=12), showgrid=True, gridcolor="#e2e8f0")
+        fig.update_yaxes(autorange="reversed", tickfont=dict(size=12, color="#24323d"))
+        fig.update_xaxes(
+            tickangle=0,
+            tickfont=dict(size=12, color="#24323d"),
+            showgrid=True,
+            gridcolor="#d6dee8",
+            title=""
+        )
         fig.update_layout(
             title="Full project schedule",
             plot_bgcolor="white",
             paper_bgcolor="white",
-            font=dict(color="#334155", size=13),
-            margin=dict(l=30, r=20, t=60, b=20),
+            font=dict(color="#24323d", size=13),
             legend_title_text=color_col,
+            legend=dict(font=dict(color="#24323d"), bgcolor="rgba(255,255,255,0.90)"),
+            margin=dict(l=20, r=20, t=70, b=20),
         )
 
         for _, row in milestones.dropna(subset=["Date"]).iterrows():
-            fig.add_vline(x=row["Date"], line_dash="dot", line_color="#94a3b8", opacity=0.65)
+            fig.add_vline(x=row["Date"], line_dash="dot", line_color="#94a3b8", opacity=0.7)
 
         st.plotly_chart(fig, use_container_width=True)
 
-        milestone_view = milestones.dropna(subset=["Date"]).copy()
-        milestone_view["Date"] = milestone_view["Date"].dt.strftime("%Y-%m-%d")
-        st.markdown("**Milestones**")
-        st.dataframe(milestone_view, use_container_width=True, hide_index=True)
-
-        proto_summary = (
-            filtered.groupby(["Project", "Prototype"], dropna=False)
-            .agg(Start=("StartDate", "min"), End=("EndDate", "max"), Tasks=("Task", "count"), AvgProgress=("Progress", "mean"))
-            .reset_index()
-            .sort_values(["Project", "Start"])
-        )
-        st.markdown("**Prototype schedule summary**")
-        st.dataframe(proto_summary, use_container_width=True, hide_index=True)
+        c1, c2 = st.columns([1, 2])
+        with c1:
+            st.markdown("**Milestones**")
+            milestone_view = milestones.dropna(subset=["Date"]).copy()
+            milestone_view["Date"] = milestone_view["Date"].dt.strftime("%Y-%m-%d")
+            st.dataframe(milestone_view, use_container_width=True, hide_index=True)
+        with c2:
+            st.markdown("**Tasks by project / prototype**")
+            proto_summary = (
+                filtered.groupby(["Project", "Prototype"], dropna=False)
+                .agg(Start=("StartDate", "min"), End=("EndDate", "max"), Tasks=("Task", "count"), AvgProgress=("Progress", "mean"))
+                .reset_index()
+                .sort_values(["Project", "Start"])
+            )
+            st.dataframe(proto_summary, use_container_width=True, hide_index=True)
 
 with tab2:
+    st.subheader("Roadmap by week")
+    st.markdown('<div class="small-note">A cleaner product-style weekly roadmap so you can see what is happening each week without reading the full Gantt.</div>', unsafe_allow_html=True)
+
+    week_df = filtered.dropna(subset=["StartDate", "EndDate"]).copy()
+    if not week_df.empty:
+        week_df["WeekStart"] = week_df["StartDate"].dt.to_period("W").apply(lambda r: r.start_time if pd.notna(r) else pd.NaT)
+        roadmap_weeks = sorted(week_df["WeekStart"].dropna().unique().tolist())
+
+        if roadmap_weeks:
+            week_labels = [pd.Timestamp(w).strftime("%Y-%m-%d") for w in roadmap_weeks]
+            chosen_week = st.selectbox("Focus week", week_labels, index=0)
+
+            for wk in roadmap_weeks:
+                wk = pd.Timestamp(wk)
+                wk_end = wk + pd.Timedelta(days=6)
+                wk_tasks = week_df[(week_df["StartDate"] <= wk_end) & (week_df["EndDate"] >= wk)].copy()
+                if wk_tasks.empty:
+                    continue
+
+                with st.container():
+                    st.markdown(
+                        f"""
+                        <div class="roadmap-card">
+                          <div class="roadmap-title">Week of {wk.strftime('%b %d, %Y')}</div>
+                          <div class="roadmap-sub">{len(wk_tasks)} active task(s)</div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                    col_a, col_b, col_c = st.columns([1.2, 1.2, 2.8])
+
+                    by_proj = wk_tasks.groupby("Project").size().reset_index(name="Tasks")
+                    figp = px.bar(
+                        by_proj, x="Project", y="Tasks", text="Tasks", color="Project",
+                        color_discrete_map=PROJECT_COLORS, height=250
+                    )
+                    figp.update_layout(
+                        plot_bgcolor="white", paper_bgcolor="white", margin=dict(l=10,r=10,t=20,b=10),
+                        font=dict(color="#24323d"), showlegend=False, xaxis_title="", yaxis_title=""
+                    )
+                    figp.update_traces(textposition="outside")
+                    col_a.plotly_chart(figp, use_container_width=True)
+
+                    by_stat = wk_tasks.groupby("Status").size().reset_index(name="Tasks")
+                    figs = px.bar(
+                        by_stat, x="Status", y="Tasks", text="Tasks", color="Status",
+                        color_discrete_map=STATUS_COLORS, height=250
+                    )
+                    figs.update_layout(
+                        plot_bgcolor="white", paper_bgcolor="white", margin=dict(l=10,r=10,t=20,b=10),
+                        font=dict(color="#24323d"), showlegend=False, xaxis_title="", yaxis_title=""
+                    )
+                    figs.update_traces(textposition="outside")
+                    col_b.plotly_chart(figs, use_container_width=True)
+
+                    detail_cols = ["Project", "Prototype", "Task", "OwnersLabel", "Status", "Progress"]
+                    wk_show = wk_tasks[detail_cols].sort_values(["Project", "Prototype", "Task"]).copy()
+                    col_c.dataframe(wk_show, use_container_width=True, hide_index=True)
+
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+            st.markdown("### Focus week details")
+            focus_start = pd.to_datetime(chosen_week)
+            focus_end = focus_start + pd.Timedelta(days=6)
+            focus_tasks = week_df[(week_df["StartDate"] <= focus_end) & (week_df["EndDate"] >= focus_start)].copy()
+            focus_tasks["TaskLabel"] = focus_tasks.apply(lambda r: f"{r['Prototype']} • {r['Task']}", axis=1)
+
+            if not focus_tasks.empty:
+                fig_focus = px.bar(
+                    focus_tasks.sort_values(["Project", "Prototype", "Task"]),
+                    x="Progress",
+                    y="TaskLabel",
+                    orientation="h",
+                    color="Status",
+                    color_discrete_map=STATUS_COLORS,
+                    title=f"Task progress for week of {focus_start.strftime('%b %d, %Y')}",
+                    height=max(400, 28 * len(focus_tasks) + 120),
+                )
+                fig_focus.update_layout(
+                    plot_bgcolor="white", paper_bgcolor="white", font=dict(color="#24323d"),
+                    xaxis_title="Progress (%)", yaxis_title="", legend_title_text="Status"
+                )
+                st.plotly_chart(fig_focus, use_container_width=True)
+
+with tab3:
     st.subheader("Dashboard")
     if len(filtered):
         left, right = st.columns(2)
 
         by_status = filtered.groupby("Status", dropna=False).size().reset_index(name="Count")
         fig1 = px.bar(
-            by_status, x="Status", y="Count", title="Tasks by status",
-            color="Status", color_discrete_map=STATUS_COLORS,
-            text="Count"
+            by_status,
+            x="Status",
+            y="Count",
+            text="Count",
+            color="Status",
+            color_discrete_map=STATUS_COLORS,
+            title="Tasks by status",
         )
-        fig1.update_layout(plot_bgcolor="white", paper_bgcolor="white", xaxis_title="", yaxis_title="Tasks")
+        fig1.update_layout(
+            plot_bgcolor="white", paper_bgcolor="white", xaxis_title="", yaxis_title="Tasks",
+            font=dict(color="#24323d"),
+        )
         fig1.update_traces(textposition="outside")
         left.plotly_chart(fig1, use_container_width=True)
 
-        by_proto = filtered.groupby("Prototype", dropna=False)["Progress"].mean().reset_index().sort_values("Progress", ascending=True)
+        by_project = filtered.groupby("Project", dropna=False)["Progress"].mean().reset_index().sort_values("Progress", ascending=True)
         fig2 = px.bar(
-            by_proto, x="Progress", y="Prototype", orientation="h",
-            title="Average progress by prototype", color="Prototype",
-            color_discrete_sequence=CHART_PALETTE, text="Progress"
+            by_project,
+            x="Progress",
+            y="Project",
+            orientation="h",
+            text="Progress",
+            color="Project",
+            color_discrete_map=PROJECT_COLORS,
+            title="Average progress by project",
         )
-        fig2.update_layout(plot_bgcolor="white", paper_bgcolor="white", showlegend=False, xaxis_title="Average progress (%)", yaxis_title="")
+        fig2.update_layout(
+            plot_bgcolor="white", paper_bgcolor="white", yaxis_title="", xaxis_title="Average progress (%)",
+            font=dict(color="#24323d"), showlegend=False,
+        )
+        fig2.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
         right.plotly_chart(fig2, use_container_width=True)
 
         a, b = st.columns(2)
-        owner_load = filtered.explode("Owners")
-        owner_load = owner_load[owner_load["Owners"].notna() & (owner_load["Owners"] != "")]
-        owner_summary = owner_load.groupby("Owners").agg(Tasks=("Task", "count"), AvgProgress=("Progress", "mean")).reset_index().sort_values("Tasks", ascending=True)
+
+        by_proto = filtered.groupby("Prototype", dropna=False)["Progress"].mean().reset_index().sort_values("Progress", ascending=True)
         fig3 = px.bar(
-            owner_summary, x="Tasks", y="Owners", orientation="h",
-            title="Task load by owner", color="Owners", color_discrete_sequence=CHART_PALETTE, text="Tasks"
+            by_proto,
+            x="Progress",
+            y="Prototype",
+            orientation="h",
+            text="Progress",
+            color="Prototype",
+            color_discrete_sequence=CHART_PALETTE,
+            title="Average progress by prototype",
         )
-        fig3.update_layout(plot_bgcolor="white", paper_bgcolor="white", showlegend=False, yaxis_title="", xaxis_title="Tasks")
+        fig3.update_layout(
+            plot_bgcolor="white", paper_bgcolor="white", yaxis_title="", xaxis_title="Average progress (%)",
+            font=dict(color="#24323d"), showlegend=False,
+        )
+        fig3.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
         a.plotly_chart(fig3, use_container_width=True)
 
-        week_view = filtered.copy()
-        week_view["WeekStart"] = week_view["StartDate"].dt.to_period("W").apply(lambda r: r.start_time if pd.notna(r) else pd.NaT)
-        week_summary = week_view.groupby("WeekStart", dropna=False).agg(Tasks=("Task", "count"), AvgProgress=("Progress", "mean")).reset_index().dropna()
-        fig4 = px.line(week_summary, x="WeekStart", y="AvgProgress", markers=True, title="Average progress by week")
-        fig4.update_traces(line_color="#4f8f87", marker_color="#e89b2d", marker_size=9)
-        fig4.update_layout(plot_bgcolor="white", paper_bgcolor="white", yaxis_title="Average progress (%)", xaxis_title="")
+        owner_load = filtered.explode("Owners")
+        owner_load = owner_load[owner_load["Owners"].notna() & (owner_load["Owners"] != "")]
+        owner_summary = owner_load.groupby("Owners").agg(
+            Tasks=("Task", "count"),
+            AvgProgress=("Progress", "mean")
+        ).reset_index().sort_values("Tasks", ascending=True)
+
+        fig4 = px.bar(
+            owner_summary,
+            x="Tasks",
+            y="Owners",
+            orientation="h",
+            text="Tasks",
+            color="Owners",
+            color_discrete_sequence=CHART_PALETTE,
+            title="Task load by owner",
+        )
+        fig4.update_layout(
+            plot_bgcolor="white", paper_bgcolor="white", yaxis_title="", xaxis_title="Tasks",
+            font=dict(color="#24323d"), showlegend=False,
+        )
+        fig4.update_traces(textposition="outside")
         b.plotly_chart(fig4, use_container_width=True)
 
         overdue_df = filtered[filtered["Overdue"]].copy()
@@ -310,136 +533,125 @@ with tab2:
         else:
             st.dataframe(
                 overdue_df[["Project", "Prototype", "Task", "OwnersLabel", "EndDate", "Status", "Progress"]],
-                use_container_width=True, hide_index=True
+                use_container_width=True,
+                hide_index=True,
             )
 
-with tab3:
+with tab4:
+    st.subheader("Tasks table")
+    st.markdown('<div class="small-note">Clear table view of the filtered tasks. Use this as the operational list, then jump to the editor tab to update a specific task.</div>', unsafe_allow_html=True)
+
+    show_cols = [
+        "Project", "Prototype", "Stage", "Task", "OwnersLabel", "StartDate", "EndDate",
+        "DurationDays", "Status", "Progress", "Priority", "WeeklyUpdate", "Notes", "LabRequired"
+    ]
+    table_df = filtered[show_cols].copy().rename(columns={"OwnersLabel": "Owners"})
+    st.dataframe(table_df, use_container_width=True, hide_index=True)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**Project slice**")
+        project_focus = st.selectbox("View one project", ["All"] + project_options, index=0)
+        if project_focus != "All":
+            st.dataframe(table_df[table_df["Project"] == project_focus], use_container_width=True, hide_index=True)
+    with c2:
+        st.markdown("**Prototype slice**")
+        prototype_focus = st.selectbox("View one prototype", ["All"] + prototype_options, index=0)
+        if prototype_focus != "All":
+            st.dataframe(table_df[table_df["Prototype"] == prototype_focus], use_container_width=True, hide_index=True)
+
+with tab5:
     st.subheader("Task editor")
-    st.markdown('<div class="tiny-note">I replaced the unstable in-table multi-owner widget with a safer two-part editor: a stable table for dates/status/progress and a row editor with a real multiselect for owners. This avoids the Streamlit Cloud crash.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="small-note">Edit one task at a time here. This keeps the app stable while still giving you full control over owners, progress, dates, and notes.</div>', unsafe_allow_html=True)
 
-    display_cols = ["Project", "Prototype", "Stage", "Task", "OwnersLabel", "StartDate", "EndDate", "DurationDays", "Status", "Progress", "Priority", "WeeklyUpdate", "Notes", "LabRequired", "CreatedFromTemplate"]
-    table_df = filtered[display_cols].copy().rename(columns={"OwnersLabel": "Owners"})
-    edited = st.data_editor(
-        table_df,
-        use_container_width=True,
-        num_rows="dynamic",
-        hide_index=True,
-        column_config={
-            "Project": st.column_config.SelectboxColumn("Project", options=project_options),
-            "Prototype": st.column_config.SelectboxColumn("Prototype", options=prototype_options),
-            "Owners": st.column_config.TextColumn("Owners", help="Use the detailed editor below to pick multiple owners safely."),
-            "Status": st.column_config.SelectboxColumn("Status", options=STATUS_OPTIONS),
-            "Priority": st.column_config.SelectboxColumn("Priority", options=PRIORITY_OPTIONS),
-            "StartDate": st.column_config.DateColumn("Start date", format="YYYY-MM-DD"),
-            "EndDate": st.column_config.DateColumn("End date", format="YYYY-MM-DD"),
-            "DurationDays": st.column_config.NumberColumn("Duration (days)", min_value=0, step=1),
-            "Progress": st.column_config.NumberColumn("Progress (%)", min_value=0, max_value=100, step=5),
-            "WeeklyUpdate": st.column_config.TextColumn("Weekly update"),
-            "Notes": st.column_config.TextColumn("Notes"),
-            "LabRequired": st.column_config.SelectboxColumn("Lab required", options=["", "Yes"]),
-        },
-        key="stable_editor_v4",
-    )
-
-    if st.button("Save table changes"):
-        current = tasks.copy()
-        edited_save = edited.copy()
-        edited_save["StartDate"] = pd.to_datetime(edited_save["StartDate"], errors="coerce")
-        edited_save["EndDate"] = pd.to_datetime(edited_save["EndDate"], errors="coerce")
-        edited_save["Progress"] = pd.to_numeric(edited_save["Progress"], errors="coerce").fillna(0).clip(0, 100)
-        edited_save["DurationDays"] = [compute_duration_days(s, e) for s, e in zip(edited_save["StartDate"], edited_save["EndDate"])]
-        edited_save["Owners"] = edited_save["Owners"].apply(parse_json_list)
-
-        save_cols = ["Project", "Prototype", "Stage", "Task", "Owners", "StartDate", "EndDate", "DurationDays", "Status", "Progress", "WeeklyUpdate", "Notes", "Priority", "LabRequired", "CreatedFromTemplate"]
-        edited_save = edited_save.rename(columns={"Owners": "Owners"})
-        non_visible = current.loc[~current.index.isin(filtered.index), :]
-        # align edited rows back to full schema
-        merged = pd.concat([non_visible, edited_save], ignore_index=True)
-        for col in current.columns:
-            if col not in merged.columns:
-                merged[col] = current[col].iloc[0] if len(current[col]) else ""
-        save_tasks(merged[current.columns])
-        st.success("Table changes saved to tasks.csv")
-
-    st.markdown("### Detailed row editor")
-    row_options = [f"{i} | {row['Prototype']} | {row['Task']}" for i, row in filtered.reset_index().iterrows()]
+    row_options = [f"{idx} | {row['Project']} | {row['Prototype']} | {row['Task']}" for idx, row in filtered.iterrows()]
     if row_options:
-        selected_row_label = st.selectbox("Select a task to edit in detail", row_options)
-        selected_original_index = int(selected_row_label.split(" | ")[0])
-        row = tasks.loc[selected_original_index].copy()
+        selected_label = st.selectbox("Select task", row_options)
+        selected_index = int(selected_label.split(" | ")[0])
+        row = tasks.loc[selected_index].copy()
 
         c1, c2, c3 = st.columns(3)
-        new_status = c1.selectbox("Status", STATUS_OPTIONS, index=STATUS_OPTIONS.index(row["Status"]) if row["Status"] in STATUS_OPTIONS else 0, key="detail_status")
-        new_progress = c2.slider("Progress (%)", 0, 100, int(row["Progress"]), 5, key="detail_progress")
-        new_priority = c3.selectbox("Priority", PRIORITY_OPTIONS, index=PRIORITY_OPTIONS.index(row["Priority"]) if row["Priority"] in PRIORITY_OPTIONS else 1, key="detail_priority")
+        new_project = c1.selectbox("Project", project_options, index=project_options.index(row["Project"]) if row["Project"] in project_options else 0)
+        new_prototype = c2.selectbox("Prototype", prototype_options, index=prototype_options.index(row["Prototype"]) if row["Prototype"] in prototype_options else 0)
+        new_priority = c3.selectbox("Priority", PRIORITY_OPTIONS, index=PRIORITY_OPTIONS.index(row["Priority"]) if row["Priority"] in PRIORITY_OPTIONS else 1)
 
-        d1, d2 = st.columns(2)
-        new_start = d1.date_input("Start date", value=row["StartDate"].date() if pd.notna(row["StartDate"]) else pd.Timestamp.today().date(), key="detail_start")
-        new_end = d2.date_input("End date", value=row["EndDate"].date() if pd.notna(row["EndDate"]) else pd.Timestamp.today().date(), key="detail_end")
+        d1, d2, d3 = st.columns(3)
+        new_status = d1.selectbox("Status", STATUS_OPTIONS, index=STATUS_OPTIONS.index(row["Status"]) if row["Status"] in STATUS_OPTIONS else 0)
+        new_progress = d2.slider("Progress (%)", 0, 100, int(row["Progress"]), 5)
+        new_lab = d3.selectbox("Lab required", ["", "Yes"], index=1 if str(row["LabRequired"]) == "Yes" else 0)
 
-        new_owners = st.multiselect("Owners", people_options, default=[o for o in row["Owners"] if o in people_options], key="detail_owners")
-        new_update = st.text_input("Weekly update", value=str(row["WeeklyUpdate"]), key="detail_update")
-        new_notes = st.text_area("Notes", value=str(row["Notes"]), key="detail_notes")
-        new_lab = st.selectbox("Lab required", ["", "Yes"], index=1 if str(row["LabRequired"]) == "Yes" else 0, key="detail_lab")
+        e1, e2 = st.columns(2)
+        new_start = e1.date_input("Start date", value=row["StartDate"].date() if pd.notna(row["StartDate"]) else pd.Timestamp.today().date())
+        new_end = e2.date_input("End date", value=row["EndDate"].date() if pd.notna(row["EndDate"]) else pd.Timestamp.today().date())
 
-        if st.button("Save detailed row changes"):
-            tasks.loc[selected_original_index, "Status"] = new_status
-            tasks.loc[selected_original_index, "Progress"] = new_progress
-            tasks.loc[selected_original_index, "Priority"] = new_priority
-            tasks.loc[selected_original_index, "StartDate"] = pd.to_datetime(new_start)
-            tasks.loc[selected_original_index, "EndDate"] = pd.to_datetime(new_end)
-            tasks.loc[selected_original_index, "DurationDays"] = compute_duration_days(new_start, new_end)
-            tasks.loc[selected_original_index, "Owners"] = new_owners
-            tasks.loc[selected_original_index, "OwnersLabel"] = ", ".join(new_owners)
-            tasks.loc[selected_original_index, "WeeklyUpdate"] = new_update
-            tasks.loc[selected_original_index, "Notes"] = new_notes
-            tasks.loc[selected_original_index, "LabRequired"] = new_lab
+        new_stage = st.text_input("Stage / general activity", value=str(row["Stage"]))
+        new_task = st.text_input("Task name", value=str(row["Task"]))
+        new_owners = st.multiselect("Owners", people_options, default=[o for o in row["Owners"] if o in people_options])
+        new_update = st.text_input("Weekly update", value=str(row["WeeklyUpdate"]))
+        new_notes = st.text_area("Notes", value=str(row["Notes"]))
+
+        if st.button("Save selected task"):
+            tasks.loc[selected_index, "Project"] = new_project
+            tasks.loc[selected_index, "Prototype"] = new_prototype
+            tasks.loc[selected_index, "Priority"] = new_priority
+            tasks.loc[selected_index, "Status"] = new_status
+            tasks.loc[selected_index, "Progress"] = new_progress
+            tasks.loc[selected_index, "LabRequired"] = new_lab
+            tasks.loc[selected_index, "StartDate"] = pd.to_datetime(new_start)
+            tasks.loc[selected_index, "EndDate"] = pd.to_datetime(new_end)
+            tasks.loc[selected_index, "DurationDays"] = compute_duration_days(new_start, new_end)
+            tasks.loc[selected_index, "Stage"] = new_stage
+            tasks.loc[selected_index, "Task"] = new_task
+            tasks.loc[selected_index, "Owners"] = new_owners
+            tasks.loc[selected_index, "WeeklyUpdate"] = new_update
+            tasks.loc[selected_index, "Notes"] = new_notes
             save_tasks(tasks)
-            st.success("Detailed changes saved.")
+            st.success("Task updated successfully.")
 
-    with st.expander("Add a manual mini-task"):
-        with st.form("manual_task_v4"):
-            c1, c2, c3 = st.columns(3)
-            project = c1.selectbox("Project", project_options)
-            prototype = c2.selectbox("Prototype", prototype_options)
-            priority = c3.selectbox("Priority", PRIORITY_OPTIONS, index=1)
-            stage = st.text_input("Stage / general activity", value="General")
-            task_name = st.text_input("Task name")
-            owners = st.multiselect("Owners", people_options)
-            d1, d2, d3 = st.columns(3)
-            start = d1.date_input("Start date", key="manual_start")
-            end = d2.date_input("End date", key="manual_end")
-            status = d3.selectbox("Initial status", STATUS_OPTIONS, key="manual_status")
-            weekly_update = st.text_input("Weekly update", key="manual_update")
-            notes = st.text_area("Notes", key="manual_notes")
-            lab_required = st.selectbox("Lab required?", ["", "Yes"], key="manual_lab")
-            submitted = st.form_submit_button("Add task")
+    st.markdown("### Add a manual mini-task")
+    with st.form("manual_task_form_v6"):
+        c1, c2, c3 = st.columns(3)
+        project = c1.selectbox("Project", project_options)
+        prototype = c2.selectbox("Prototype", prototype_options)
+        priority = c3.selectbox("Priority", PRIORITY_OPTIONS, index=1)
 
-            if submitted and task_name:
-                progress_seed = 100 if status == "Done" else (35 if status == "In Progress" else 0)
-                row = {
-                    "Project": project,
-                    "Prototype": prototype,
-                    "Stage": stage,
-                    "Task": task_name,
-                    "Owners": owners,
-                    "StartDate": pd.to_datetime(start),
-                    "EndDate": pd.to_datetime(end),
-                    "DurationDays": compute_duration_days(start, end),
-                    "Status": status,
-                    "Progress": progress_seed,
-                    "WeeklyUpdate": weekly_update,
-                    "Notes": notes,
-                    "Priority": priority,
-                    "LabRequired": lab_required,
-                    "CreatedFromTemplate": "Manual",
-                    "PinnedWeek1": False,
-                }
-                tasks_new = pd.concat([tasks, pd.DataFrame([row])], ignore_index=True)
-                save_tasks(tasks_new)
-                st.success("Manual mini-task added. Refresh the app if needed.")
+        stage = st.text_input("Stage / general activity", value="General")
+        task_name = st.text_input("Task name")
+        owners = st.multiselect("Owners", people_options)
+        d1, d2, d3 = st.columns(3)
+        start = d1.date_input("Start date", key="manual_start_v6")
+        end = d2.date_input("End date", key="manual_end_v6")
+        status = d3.selectbox("Initial status", STATUS_OPTIONS)
+        weekly_update = st.text_input("Weekly update")
+        notes = st.text_area("Notes")
+        lab_required = st.selectbox("Lab required?", ["", "Yes"])
 
-with tab4:
+        submitted = st.form_submit_button("Add task")
+        if submitted and task_name:
+            progress_seed = 100 if status == "Done" else (35 if status == "In Progress" else 0)
+            row = {
+                "Project": project,
+                "Prototype": prototype,
+                "Stage": stage,
+                "Task": task_name,
+                "Owners": owners,
+                "StartDate": pd.to_datetime(start),
+                "EndDate": pd.to_datetime(end),
+                "DurationDays": compute_duration_days(start, end),
+                "Status": status,
+                "Progress": progress_seed,
+                "WeeklyUpdate": weekly_update,
+                "Notes": notes,
+                "Priority": priority,
+                "LabRequired": lab_required,
+                "CreatedFromTemplate": "Manual",
+                "PinnedWeek1": False,
+            }
+            tasks_new = pd.concat([tasks, pd.DataFrame([row])], ignore_index=True)
+            save_tasks(tasks_new)
+            st.success("Manual task added.")
+
+with tab6:
     st.subheader("Weekly report")
     report_df = filtered.copy()
     report_df["WeekStart"] = report_df["StartDate"].dt.to_period("W").apply(lambda r: r.start_time if pd.notna(r) else pd.NaT)
@@ -455,28 +667,10 @@ with tab4:
         k1, k2, k3 = st.columns(3)
         k1.metric("Active tasks", int(len(week_tasks)))
         k2.metric("Completed", int((week_tasks["Status"] == "Done").sum()))
-        k3.metric("Average progress", f"{round(week_tasks['Progress'].mean() if len(week_tasks) else 0,1)}%")
+        k3.metric("Average progress", f"{round(week_tasks['Progress'].mean() if len(week_tasks) else 0, 1)}%")
 
         st.dataframe(
             week_tasks[["Project", "Prototype", "Task", "OwnersLabel", "Status", "Progress", "WeeklyUpdate", "Notes"]],
-            use_container_width=True, hide_index=True
+            use_container_width=True,
+            hide_index=True,
         )
-
-with tab5:
-    st.subheader("Reference tables")
-    r1, r2 = st.columns(2)
-    with r1:
-        proto_ref = prototypes.copy()
-        proto_ref["DefaultOwners"] = proto_ref["DefaultOwners"].apply(lambda x: ", ".join(x))
-        st.markdown("**Prototype owners**")
-        st.dataframe(proto_ref[["Project", "Prototype", "DefaultOwners", "Notes"]], use_container_width=True, hide_index=True)
-    with r2:
-        st.markdown("**Milestones**")
-        st.dataframe(milestones.sort_values("Date"), use_container_width=True, hide_index=True)
-
-    st.markdown("**Master activity library**")
-    st.dataframe(templates, use_container_width=True, hide_index=True)
-
-st.divider()
-st.markdown("App palette: `['#f6bd60', '#f7ede2', '#f5cac3', '#84a59d', '#f28482']` with higher-contrast accents for readability.")
-st.markdown("Chart palette: `['#fbf8cc', '#fde4cf', '#ffcfd2', '#f1c0e8', '#cfbaf0', '#a3c4f3', '#90dbf4', '#8eecf5', '#98f5e1', '#b9fbc0']`.")
