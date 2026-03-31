@@ -1,0 +1,60 @@
+Project,Prototype,Stage,Task,Owners,StartDate,EndDate,DurationDays,Status,Progress,WeeklyUpdate,Notes,Priority,LabRequired,CreatedFromTemplate,PinnedWeek1
+Urosim,Trocal model,Demo protoboard,Demo protoboard,"[""David""]",2026-03-31,2026-04-06,7,Not Started,0,,Measure with the sensor and visualize angles,Medium,,Yes,False
+Urosim,Trocal model,Interface and software design,Interface and software design,"[""David""]",2026-04-07,2026-04-20,14,Not Started,0,,"Implement a basic 3D model, calibration method, and trajectory display",Medium,,Yes,False
+Urosim,Trocal model,Adapted trocar design,Adapted trocar design,"[""David""]",2026-04-21,2026-04-27,7,Not Started,0,,"3D design based on the components, PCB or floating setup",Medium,,Yes,False
+Urosim,Trocal model,Trocar prototype,Trocar prototype,"[""David""]",2026-04-28,2026-05-04,7,Not Started,0,,Build the prototype (printing and soldering),Medium,,Yes,False
+Urosim,Trocal model,Integrate with 3D model,Integrate with 3D model,"[""David""]",2026-05-05,2026-05-11,7,Not Started,0,,Polish the interface or integrate with existing software,Medium,,Yes,False
+Trocasense,Tactibladder,Test sensors,Test sensors,"[""David"", ""Stef""]",2026-03-31,2026-03-31,1,Not Started,0,,Connect strain gauges to a microcontroller and inspect the signal,Medium,,Yes,False
+Trocasense,Tactibladder,Trocar cover design,Trocar cover design,"[""David"", ""Stef""]",2026-04-01,2026-04-07,7,Not Started,0,,Design around handle geometry and component placement,Medium,,Yes,False
+Trocasense,Tactibladder,Circuit design,Circuit design,"[""David"", ""Stef""]",2026-04-08,2026-04-14,7,Not Started,0,,"Integrate sensors with button, alert, etc.",Medium,,Yes,False
+Trocasense,Tactibladder,Prototype,Prototype,"[""David"", ""Stef""]",2026-04-15,2026-04-21,7,Not Started,0,,Integrate circuit design with 3D model,Medium,,Yes,False
+Trocasense,Tactibladder,Test 1,Test 1,"[""David"", ""Stef""]",2026-04-22,2026-04-28,7,Not Started,0,,Calibrate forces and define freedom thresholds,Medium,,Yes,False
+Trocasense,Tactibladder,Test 2,Test 2,"[""David"", ""Stef""]",2026-04-29,2026-05-05,7,Not Started,0,,Calibrate forces with ex vivo tissue,Medium,,Yes,False
+Urosim,Bladder,Define design,Define design,"[""David"", ""Stef""]",2026-03-31,2026-04-06,7,Not Started,0,,"Propose materials, geometries, and detection methods",Medium,,Yes,False
+Urosim,Bladder,Test materials,Test materials,"[""David"", ""Stef""]",2026-04-07,2026-04-16,10,Not Started,0,,Separate and join materials so they close the circuit,Medium,,Yes,False
+Urosim,Bladder,Final design,Final design,"[""David"", ""Stef""]",2026-04-17,2026-04-23,7,Not Started,0,,Build the design,Medium,,Yes,False
+Urosim,Bladder,Integrate into simulator,Integrate into simulator,"[""David"", ""Stef""]",2026-04-24,2026-04-30,7,Not Started,0,,Integrate into the simulator model,Medium,,Yes,False
+Urosim,Bladder,Testing,Testing,"[""David"", ""Stef""]",2026-05-01,2026-05-07,7,Not Started,0,,"Simulate the procedure and, if possible, integrate with trocar interface",Medium,,Yes,False
+Trocasense,Impedance,First circuit,First circuit,"[""José"", ""Santiago"", ""Andrea""]",2026-03-31,2026-04-06,7,Not Started,0,,2 copper plates and multimeter,Medium,Yes,Yes,False
+Trocasense,Impedance,Transform plates into tube concept,Transform plates into tube concept,"[""José"", ""Santiago"", ""Andrea""]",2026-04-07,2026-04-13,7,Not Started,0,,"Research impedance circuit shapes, brainstorm, sketch, additional materials",Medium,,Yes,False
+Trocasense,Impedance,Build second circuit,Build second circuit,"[""José"", ""Santiago"", ""Andrea""]",2026-04-14,2026-04-20,7,Not Started,0,,Implement the new configuration,Medium,,Yes,False
+Trocasense,Impedance,Testing,Testing,"[""José"", ""Santiago"", ""Andrea""]",2026-04-21,2026-04-27,7,Not Started,0,,Lab with new configuration and calibration,Medium,Yes,Yes,False
+Trocasense,Impedance,Tissue testing,Tissue testing,"[""José"", ""Santiago"", ""Andrea""]",2026-04-28,2026-05-11,14,Not Started,0,,Get several tissues to calibrate across impedances and compare with commercial circuits,Medium,Yes,Yes,False
+Urosim,Skin,Materials,Materials,"[""Santiago"", ""Mariana""]",2026-03-31,2026-04-06,7,Not Started,0,,Define filler material and skin material,Medium,,Yes,False
+Urosim,Skin,Test 1,Test 1,"[""Santiago"", ""Mariana""]",2026-04-07,2026-04-20,14,Not Started,0,,Small rectangular set to test filler,Medium,,Yes,False
+Urosim,Skin,Real skin,Real skin,"[""Santiago"", ""Mariana""]",2026-04-21,2026-04-27,7,Not Started,0,,"Model with real anatomy, details, and casting",Medium,,Yes,False
+Urosim,Skin,Molds and final skin manufacturing,Molds and final skin manufacturing,"[""Santiago"", ""Mariana""]",2026-04-28,2026-05-04,7,Not Started,0,,"Prepare molds, gels, etc.",Medium,,Yes,False
+Urosim,Skin,Final prototype,Final prototype,"[""Santiago"", ""Mariana""]",2026-05-05,2026-05-11,7,Not Started,0,,Integrate everything and test the procedure,Medium,,Yes,False
+Trocasense,Angles analysis,Test prep,Test prep,"[""José"", ""Stef"", ""Santiago"", ""Mariana"", ""Sara""]",2026-03-31,2026-04-06,7,Not Started,0,,"Talk with lab, marker protocol, schedule data collection",Medium,,Yes,False
+Trocasense,Angles analysis,IBIOMECH test 1,IBIOMECH test 1,"[""José"", ""Stef"", ""Santiago"", ""Mariana"", ""Sara""]",2026-04-07,2026-04-13,7,Not Started,0,,"Collect data with the simulator and us performing the procedure, then process it",Medium,,Yes,False
+Trocasense,Angles analysis,Kinovea test 1,Kinovea test 1,"[""José"", ""Stef"", ""Santiago"", ""Mariana"", ""Sara""]",2026-04-14,2026-04-20,7,Not Started,0,,Repeat the simulator test using Kinovea,Medium,,Yes,False
+Trocasense,Angles analysis,Realtime model,Realtime model,"[""José"", ""Stef"", ""Santiago"", ""Mariana"", ""Sara""]",2026-04-21,2026-05-04,14,Not Started,0,,Research and implement realtime analysis with alert,Medium,,Yes,False
+Trocasense,Angles analysis,Final testing,Final testing,"[""José"", ""Stef"", ""Santiago"", ""Mariana"", ""Sara""]",2026-05-05,2026-05-11,7,Not Started,0,,Try to involve a clinical specialist for data collection,Medium,,Yes,False
+Urosim,Model base,Leg design,Leg design,"[""Stef"", ""José""]",2026-03-31,2026-04-06,7,Not Started,0,,"Limit motion area during the procedure: design, material, mount integration",Medium,,Yes,False
+Urosim,Model base,Mount design,Mount design,"[""Stef"", ""José""]",2026-04-07,2026-04-13,7,Not Started,0,,"Real size, fix pelvis, optional rotation",Medium,,Yes,False
+Urosim,Model base,Fixed parts design,Fixed parts design,"[""Stef"", ""José""]",2026-04-14,2026-04-20,7,Not Started,0,,"Pelvis with tabs, uterus, and partial bladder",Medium,,Yes,False
+Urosim,Model base,Interchangeable parts design,Interchangeable parts design,"[""Stef"", ""José""]",2026-04-21,2026-04-27,7,Not Started,0,,Skin integrated with pelvis tabs and bladder,Medium,,Yes,False
+Urosim,Model base,Mold design,Mold design,"[""Stef"", ""José""]",2026-04-28,2026-05-04,7,Not Started,0,,"Skin, uterus",Medium,,Yes,False
+Urosim,Model base,Mold printing and manufacturing,Mold printing and manufacturing,"[""Stef"", ""José""]",2026-05-05,2026-05-11,7,Not Started,0,,"Skin, uterus",Medium,,Yes,False
+Urosim,Model base,Model printing,Model printing,"[""Stef"", ""José""]",2026-05-12,2026-05-25,14,Not Started,0,,Fixed parts,Medium,,Yes,False
+Urosim,Model base,Integrate and test,Integrate and test,"[""Stef"", ""José""]",2026-05-26,2026-06-01,7,Not Started,0,,"Assemble, simulate procedure, integrate with circuits, etc.",Medium,,Yes,False
+Trocasense,Level,IBIOMECH base for angle analysis,IBIOMECH base for angle analysis,"[""Natalia"", ""Sara""]",2026-03-31,2026-04-06,7,Not Started,0,,Ask and leverage IBIOMECH to inspect trocar angles during the procedure,Medium,,Yes,False
+Trocasense,Level,First prototype,First prototype,"[""Natalia"", ""Sara""]",2026-04-07,2026-04-13,7,Not Started,0,,Level attached to trocar with preliminary angle markings,Medium,,Yes,False
+Trocasense,Level,Kinovea,Kinovea,"[""Natalia"", ""Sara""]",2026-04-14,2026-04-20,7,Not Started,0,,Define trocar angles from videos,Medium,,Yes,False
+Trocasense,Level,Integrated design,Integrated design,"[""Natalia"", ""Sara""]",2026-04-21,2026-05-04,14,Not Started,0,,Design the level adapter,Medium,,Yes,False
+Trocasense,Level,Standardize angle guide,Standardize angle guide,"[""Natalia"", ""Sara""]",2026-05-05,2026-05-18,14,Not Started,0,,Integrate final angle ranges into the final model,Medium,,Yes,False
+Urosim,Assembly,Model base,Model base,"[""Stef"", ""José""]",2026-03-31,2026-04-06,7,Not Started,0,,Prepare simulator assembly base,Medium,,Yes,False
+Urosim,Assembly,Software assembly,Software assembly,"[""Stef"", ""José""]",2026-04-07,2026-04-13,7,Not Started,0,,CAD integration and piece validation,Medium,,Yes,False
+Trocasense,General,General,Materials purchasing,"[""Santiago""]",2026-03-31,2026-04-06,7,In Progress,40,,,Medium,,Manual,True
+General,General,General,Team split,"[""Stef""]",2026-03-31,2026-03-31,1,Done,100,,,Medium,,Manual,True
+Trocasense,Angles analysis,Test prep,Email to IBIOMECH,"[""José""]",2026-03-31,2026-04-06,7,Not Started,0,,,High,,Manual,True
+Urosim,Assembly,Model base,Model base,"[""Stef""]",2026-03-31,2026-04-06,7,Not Started,0,,,High,,Manual,True
+Urosim,Assembly,Software assembly,Assembly of parts in software,"[""José""]",2026-03-31,2026-04-06,7,Not Started,0,,,High,,Manual,True
+General,General,General,Progress presentation (Apr 6),"[""Stef""]",2026-03-31,2026-04-06,7,Not Started,0,,,High,,Manual,True
+Trocasense,Level,First prototype,Physical level prototype,"[""Mariana""]",2026-03-31,2026-04-06,7,Not Started,0,,,Medium,,Manual,True
+Trocasense,Level,IBIOMECH base for angle analysis,Angle research for level,"[""Andrea""]",2026-03-31,2026-04-06,7,Not Started,0,,,Medium,,Manual,True
+Trocasense,Level,Kinovea,Trocar Kinovea,"[""Natalia""]",2026-03-31,2026-04-06,7,Not Started,0,,,Medium,,Manual,True
+Urosim,Trocal model,Demo protoboard,Trocar model motion demo,"[""David""]",2026-03-31,2026-04-06,7,Not Started,0,,,Medium,,Manual,True
+General,General,General,Ideas report document,"[""Santiago""]",2026-03-31,2026-04-06,7,Not Started,0,,,Low,,Manual,True
+General,General,General,Meeting minutes update,"[""Santiago""]",2026-03-31,2026-04-06,7,Not Started,0,,,Low,,Manual,True
+General,General,General,Final PPT template,"[""Stef""]",2026-03-31,2026-04-06,7,Not Started,0,,,Medium,,Manual,True
