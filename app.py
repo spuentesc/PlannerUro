@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
 st.set_page_config(page_title="Urosim / Trocasense Planner", layout="wide")
@@ -25,7 +24,6 @@ STATUS_COLORS = {"Not Started": "#dc2626", "In Progress": "#d97706", "Blocked": 
 STATUS_OPTIONS = ["Not Started", "In Progress", "Blocked", "Done"]
 PRIORITY_OPTIONS = ["Low", "Medium", "High", "Critical"]
 
-
 st.markdown(
     """
     <style>
@@ -35,7 +33,7 @@ st.markdown(
     }
     .block-container {
         max-width: 1550px;
-        padding-top: 1.0rem;
+        padding-top: 1rem;
         padding-bottom: 2rem;
     }
     section[data-testid="stSidebar"] {
@@ -95,14 +93,6 @@ st.markdown(
         font-size: 0.82rem;
         margin-right: 0.35rem;
     }
-    .soft-card {
-        background: #fffdfb;
-        border: 1px solid #eadbce;
-        border-radius: 20px;
-        padding: 1rem 1rem 0.9rem 1rem;
-        box-shadow: 0 8px 22px rgba(0,0,0,0.04);
-        margin-bottom: 0.8rem;
-    }
     .small-note {
         color: #475569;
         font-size: 0.92rem;
@@ -126,16 +116,10 @@ st.markdown(
         color: #64748b;
         margin-bottom: 0.35rem;
     }
-    .roadmap-line {
-        font-size: 0.92rem;
-        color: #334155;
-        margin-bottom: 0.18rem;
-    }
     </style>
     """,
     unsafe_allow_html=True,
 )
-
 
 def parse_json_list(value):
     if isinstance(value, list):
@@ -150,16 +134,13 @@ def parse_json_list(value):
         pass
     return [v.strip() for v in str(value).split(",") if v.strip()]
 
-
 def dump_json_list(value):
     if isinstance(value, list):
         return json.dumps(value, ensure_ascii=False)
     return json.dumps(parse_json_list(value), ensure_ascii=False)
 
-
 def read_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path) if path.exists() else pd.DataFrame()
-
 
 @st.cache_data
 def load_static():
@@ -167,13 +148,10 @@ def load_static():
     milestones = read_csv(MILESTONES_PATH)
     templates = read_csv(TEMPLATES_PATH)
     people = read_csv(PEOPLE_PATH)
-
     if "DefaultOwners" in prototypes.columns:
         prototypes["DefaultOwners"] = prototypes["DefaultOwners"].apply(parse_json_list)
-
     milestones["Date"] = pd.to_datetime(milestones["Date"], errors="coerce")
     return prototypes, milestones, templates, people
-
 
 def load_tasks():
     df = read_csv(TASKS_PATH)
@@ -185,7 +163,6 @@ def load_tasks():
     for col in required:
         if col not in df.columns:
             df[col] = ""
-
     df["Owners"] = df["Owners"].apply(parse_json_list)
     df["StartDate"] = pd.to_datetime(df["StartDate"], errors="coerce")
     df["EndDate"] = pd.to_datetime(df["EndDate"], errors="coerce")
@@ -196,7 +173,6 @@ def load_tasks():
     df["PinnedWeek1"] = df["PinnedWeek1"].astype(str).str.lower().isin(["true", "1", "yes"])
     return df
 
-
 def save_tasks(df):
     out = df.copy()
     out["Owners"] = out["Owners"].apply(dump_json_list)
@@ -204,14 +180,12 @@ def save_tasks(df):
     out["EndDate"] = pd.to_datetime(out["EndDate"], errors="coerce").dt.strftime("%Y-%m-%d")
     out.to_csv(TASKS_PATH, index=False)
 
-
 def compute_duration_days(start, end):
     start = pd.to_datetime(start, errors="coerce")
     end = pd.to_datetime(end, errors="coerce")
     if pd.isna(start) or pd.isna(end):
         return 0
     return max((end - start).days + 1, 0)
-
 
 def wrap_label(text, max_len=34):
     txt = str(text)
@@ -231,11 +205,41 @@ def wrap_label(text, max_len=34):
         lines.append(cur)
     return "<br>".join(lines)
 
-
 def status_pill(status: str):
     color = STATUS_COLORS.get(status, "#64748b")
     return f'<span class="status-pill" style="background:{color};">{status}</span>'
 
+def fix_plotly_axes(fig):
+    fig.update_xaxes(
+        tickfont=dict(color="#1f2937", size=12),
+        title_font=dict(color="#1f2937"),
+        showgrid=True,
+        gridcolor="#f1f5f9",
+        zeroline=False,
+    )
+    fig.update_yaxes(
+        tickfont=dict(color="#1f2937", size=12),
+        title_font=dict(color="#1f2937"),
+        showgrid=False,
+    )
+    fig.update_layout(
+        font=dict(color="#1f2937"),
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+    )
+    return fig
+
+def format_short_date(series):
+    s = pd.to_datetime(series, errors="coerce")
+    return s.dt.strftime("%b %-d") if hasattr(s.dt, "strftime") else s
+
+def pretty_table(df, date_cols=None):
+    out = df.copy()
+    date_cols = date_cols or []
+    for col in date_cols:
+        if col in out.columns:
+            out[col] = pd.to_datetime(out[col], errors="coerce").dt.strftime("%b %d")
+    return out
 
 prototypes, milestones, templates, people_df = load_static()
 tasks = load_tasks()
@@ -298,7 +302,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 
 with tab1:
     st.subheader("Master timeline")
-    st.markdown('<div class="small-note">This timeline keeps labels horizontal and readable, with milestones listed in a table below instead of angled text over the chart.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="small-note">Readable timeline plus lighter, cleaner summary tables.</div>', unsafe_allow_html=True)
 
     timeline_df = filtered.dropna(subset=["StartDate", "EndDate"]).copy()
     if not timeline_df.empty:
@@ -318,21 +322,15 @@ with tab1:
             hover_data=["Project", "Prototype", "Stage", "OwnersLabel", "Status", "Progress", "Notes"],
             height=max(750, 28 * len(timeline_df) + 240),
         )
-        fig.update_yaxes(autorange="reversed", tickfont=dict(size=12, color="#24323d"))
-        fig.update_xaxes(
-            tickangle=0,
-            tickfont=dict(size=12, color="#24323d"),
-            showgrid=True,
-            gridcolor="#d6dee8",
-            title=""
-        )
+        fig.update_yaxes(autorange="reversed", tickfont=dict(size=12, color="#1f2937"))
+        fig.update_xaxes(tickangle=0, tickfont=dict(size=12, color="#1f2937"), showgrid=True, gridcolor="#f1f5f9", title="")
         fig.update_layout(
             title="Full project schedule",
             plot_bgcolor="white",
             paper_bgcolor="white",
-            font=dict(color="#24323d", size=13),
+            font=dict(color="#1f2937", size=13),
             legend_title_text=color_col,
-            legend=dict(font=dict(color="#24323d"), bgcolor="rgba(255,255,255,0.90)"),
+            legend=dict(font=dict(color="#1f2937"), bgcolor="rgba(255,255,255,0.92)"),
             margin=dict(l=20, r=20, t=70, b=20),
         )
 
@@ -345,8 +343,16 @@ with tab1:
         with c1:
             st.markdown("**Milestones**")
             milestone_view = milestones.dropna(subset=["Date"]).copy()
-            milestone_view["Date"] = milestone_view["Date"].dt.strftime("%Y-%m-%d")
-            st.dataframe(milestone_view, use_container_width=True, hide_index=True)
+            milestone_view["Date"] = pd.to_datetime(milestone_view["Date"], errors="coerce").dt.strftime("%b %d")
+            st.dataframe(
+                milestone_view,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Date": st.column_config.TextColumn("Date"),
+                    "Label": st.column_config.TextColumn("Label"),
+                },
+            )
         with c2:
             st.markdown("**Tasks by project / prototype**")
             proto_summary = (
@@ -355,7 +361,22 @@ with tab1:
                 .reset_index()
                 .sort_values(["Project", "Start"])
             )
-            st.dataframe(proto_summary, use_container_width=True, hide_index=True)
+            proto_summary["Start"] = pd.to_datetime(proto_summary["Start"], errors="coerce").dt.strftime("%b %d")
+            proto_summary["End"] = pd.to_datetime(proto_summary["End"], errors="coerce").dt.strftime("%b %d")
+            proto_summary["AvgProgress"] = proto_summary["AvgProgress"].round(1).astype(str) + "%"
+            st.dataframe(
+                proto_summary,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Project": st.column_config.TextColumn("Project"),
+                    "Prototype": st.column_config.TextColumn("Prototype"),
+                    "Start": st.column_config.TextColumn("Start"),
+                    "End": st.column_config.TextColumn("End"),
+                    "Tasks": st.column_config.NumberColumn("Tasks"),
+                    "AvgProgress": st.column_config.TextColumn("Avg progress"),
+                },
+            )
 
 with tab2:
     st.subheader("Roadmap by week")
@@ -367,7 +388,7 @@ with tab2:
         roadmap_weeks = sorted(week_df["WeekStart"].dropna().unique().tolist())
 
         if roadmap_weeks:
-            week_labels = [pd.Timestamp(w).strftime("%Y-%m-%d") for w in roadmap_weeks]
+            week_labels = [pd.Timestamp(w).strftime("%b %d") for w in roadmap_weeks]
             chosen_week = st.selectbox("Focus week", week_labels, index=0)
 
             for wk in roadmap_weeks:
@@ -377,50 +398,37 @@ with tab2:
                 if wk_tasks.empty:
                     continue
 
-                with st.container():
-                    st.markdown(
-                        f"""
-                        <div class="roadmap-card">
-                          <div class="roadmap-title">Week of {wk.strftime('%b %d, %Y')}</div>
-                          <div class="roadmap-sub">{len(wk_tasks)} active task(s)</div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
+                st.markdown(
+                    f"""
+                    <div class="roadmap-card">
+                      <div class="roadmap-title">Week of {wk.strftime('%b %d, %Y')}</div>
+                      <div class="roadmap-sub">{len(wk_tasks)} active task(s)</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-                    col_a, col_b, col_c = st.columns([1.2, 1.2, 2.8])
+                col_a, col_b, col_c = st.columns([1.2, 1.2, 2.8])
 
-                    by_proj = wk_tasks.groupby("Project").size().reset_index(name="Tasks")
-                    figp = px.bar(
-                        by_proj, x="Project", y="Tasks", text="Tasks", color="Project",
-                        color_discrete_map=PROJECT_COLORS, height=250
-                    )
-                    figp.update_layout(
-                        plot_bgcolor="white", paper_bgcolor="white", margin=dict(l=10,r=10,t=20,b=10),
-                        font=dict(color="#24323d"), showlegend=False, xaxis_title="", yaxis_title=""
-                    )
-                    figp.update_traces(textposition="outside")
-                    col_a.plotly_chart(figp, use_container_width=True)
+                by_proj = wk_tasks.groupby("Project").size().reset_index(name="Tasks")
+                figp = px.bar(by_proj, x="Project", y="Tasks", text="Tasks", color="Project", color_discrete_map=PROJECT_COLORS, height=250)
+                figp.update_layout(margin=dict(l=10,r=10,t=20,b=10), showlegend=False, xaxis_title="", yaxis_title="")
+                figp.update_traces(textposition="outside")
+                col_a.plotly_chart(fix_plotly_axes(figp), use_container_width=True)
 
-                    by_stat = wk_tasks.groupby("Status").size().reset_index(name="Tasks")
-                    figs = px.bar(
-                        by_stat, x="Status", y="Tasks", text="Tasks", color="Status",
-                        color_discrete_map=STATUS_COLORS, height=250
-                    )
-                    figs.update_layout(
-                        plot_bgcolor="white", paper_bgcolor="white", margin=dict(l=10,r=10,t=20,b=10),
-                        font=dict(color="#24323d"), showlegend=False, xaxis_title="", yaxis_title=""
-                    )
-                    figs.update_traces(textposition="outside")
-                    col_b.plotly_chart(figs, use_container_width=True)
+                by_stat = wk_tasks.groupby("Status").size().reset_index(name="Tasks")
+                figs = px.bar(by_stat, x="Status", y="Tasks", text="Tasks", color="Status", color_discrete_map=STATUS_COLORS, height=250)
+                figs.update_layout(margin=dict(l=10,r=10,t=20,b=10), showlegend=False, xaxis_title="", yaxis_title="")
+                figs.update_traces(textposition="outside")
+                col_b.plotly_chart(fix_plotly_axes(figs), use_container_width=True)
 
-                    detail_cols = ["Project", "Prototype", "Task", "OwnersLabel", "Status", "Progress"]
-                    wk_show = wk_tasks[detail_cols].sort_values(["Project", "Prototype", "Task"]).copy()
-                    col_c.dataframe(wk_show, use_container_width=True, hide_index=True)
-
-                    st.markdown("</div>", unsafe_allow_html=True)
+                detail_cols = ["Project", "Prototype", "Task", "OwnersLabel", "Status", "Progress"]
+                wk_show = wk_tasks[detail_cols].sort_values(["Project", "Prototype", "Task"]).copy()
+                wk_show["Progress"] = wk_show["Progress"].round(0).astype(int).astype(str) + "%"
+                col_c.dataframe(wk_show, use_container_width=True, hide_index=True)
 
             st.markdown("### Focus week details")
-            focus_start = pd.to_datetime(chosen_week)
+            focus_start = pd.to_datetime(chosen_week + ", 2026", format="%b %d, %Y")
             focus_end = focus_start + pd.Timedelta(days=6)
             focus_tasks = week_df[(week_df["StartDate"] <= focus_end) & (week_df["EndDate"] >= focus_start)].copy()
             focus_tasks["TaskLabel"] = focus_tasks.apply(lambda r: f"{r['Prototype']} • {r['Task']}", axis=1)
@@ -436,11 +444,8 @@ with tab2:
                     title=f"Task progress for week of {focus_start.strftime('%b %d, %Y')}",
                     height=max(400, 28 * len(focus_tasks) + 120),
                 )
-                fig_focus.update_layout(
-                    plot_bgcolor="white", paper_bgcolor="white", font=dict(color="#24323d"),
-                    xaxis_title="Progress (%)", yaxis_title="", legend_title_text="Status"
-                )
-                st.plotly_chart(fig_focus, use_container_width=True)
+                fig_focus.update_layout(xaxis_title="Progress (%)", yaxis_title="", legend_title_text="Status")
+                st.plotly_chart(fix_plotly_axes(fig_focus), use_container_width=True)
 
 with tab3:
     st.subheader("Dashboard")
@@ -448,104 +453,51 @@ with tab3:
         left, right = st.columns(2)
 
         by_status = filtered.groupby("Status", dropna=False).size().reset_index(name="Count")
-        fig1 = px.bar(
-            by_status,
-            x="Status",
-            y="Count",
-            text="Count",
-            color="Status",
-            color_discrete_map=STATUS_COLORS,
-            title="Tasks by status",
-        )
-        fig1.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white", xaxis_title="", yaxis_title="Tasks",
-            font=dict(color="#24323d"),
-        )
+        fig1 = px.bar(by_status, x="Status", y="Count", text="Count", color="Status", color_discrete_map=STATUS_COLORS, title="Tasks by status")
+        fig1.update_layout(xaxis_title="", yaxis_title="Tasks")
         fig1.update_traces(textposition="outside")
-        left.plotly_chart(fig1, use_container_width=True)
+        left.plotly_chart(fix_plotly_axes(fig1), use_container_width=True)
 
         by_project = filtered.groupby("Project", dropna=False)["Progress"].mean().reset_index().sort_values("Progress", ascending=True)
-        fig2 = px.bar(
-            by_project,
-            x="Progress",
-            y="Project",
-            orientation="h",
-            text="Progress",
-            color="Project",
-            color_discrete_map=PROJECT_COLORS,
-            title="Average progress by project",
-        )
-        fig2.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white", yaxis_title="", xaxis_title="Average progress (%)",
-            font=dict(color="#24323d"), showlegend=False,
-        )
+        fig2 = px.bar(by_project, x="Progress", y="Project", orientation="h", text="Progress", color="Project", color_discrete_map=PROJECT_COLORS, title="Average progress by project")
+        fig2.update_layout(yaxis_title="", xaxis_title="Average progress (%)", showlegend=False)
         fig2.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-        right.plotly_chart(fig2, use_container_width=True)
+        right.plotly_chart(fix_plotly_axes(fig2), use_container_width=True)
 
         a, b = st.columns(2)
 
         by_proto = filtered.groupby("Prototype", dropna=False)["Progress"].mean().reset_index().sort_values("Progress", ascending=True)
-        fig3 = px.bar(
-            by_proto,
-            x="Progress",
-            y="Prototype",
-            orientation="h",
-            text="Progress",
-            color="Prototype",
-            color_discrete_sequence=CHART_PALETTE,
-            title="Average progress by prototype",
-        )
-        fig3.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white", yaxis_title="", xaxis_title="Average progress (%)",
-            font=dict(color="#24323d"), showlegend=False,
-        )
+        fig3 = px.bar(by_proto, x="Progress", y="Prototype", orientation="h", text="Progress", color="Prototype", color_discrete_sequence=CHART_PALETTE, title="Average progress by prototype")
+        fig3.update_layout(yaxis_title="", xaxis_title="Average progress (%)", showlegend=False)
         fig3.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-        a.plotly_chart(fig3, use_container_width=True)
+        a.plotly_chart(fix_plotly_axes(fig3), use_container_width=True)
 
         owner_load = filtered.explode("Owners")
         owner_load = owner_load[owner_load["Owners"].notna() & (owner_load["Owners"] != "")]
-        owner_summary = owner_load.groupby("Owners").agg(
-            Tasks=("Task", "count"),
-            AvgProgress=("Progress", "mean")
-        ).reset_index().sort_values("Tasks", ascending=True)
-
-        fig4 = px.bar(
-            owner_summary,
-            x="Tasks",
-            y="Owners",
-            orientation="h",
-            text="Tasks",
-            color="Owners",
-            color_discrete_sequence=CHART_PALETTE,
-            title="Task load by owner",
-        )
-        fig4.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white", yaxis_title="", xaxis_title="Tasks",
-            font=dict(color="#24323d"), showlegend=False,
-        )
+        owner_summary = owner_load.groupby("Owners").agg(Tasks=("Task", "count"), AvgProgress=("Progress", "mean")).reset_index().sort_values("Tasks", ascending=True)
+        fig4 = px.bar(owner_summary, x="Tasks", y="Owners", orientation="h", text="Tasks", color="Owners", color_discrete_sequence=CHART_PALETTE, title="Task load by owner")
+        fig4.update_layout(yaxis_title="", xaxis_title="Tasks", showlegend=False)
         fig4.update_traces(textposition="outside")
-        b.plotly_chart(fig4, use_container_width=True)
+        b.plotly_chart(fix_plotly_axes(fig4), use_container_width=True)
 
         overdue_df = filtered[filtered["Overdue"]].copy()
         st.markdown("**Overdue tasks**")
         if overdue_df.empty:
             st.success("No overdue tasks in the current filtered view.")
         else:
-            st.dataframe(
-                overdue_df[["Project", "Prototype", "Task", "OwnersLabel", "EndDate", "Status", "Progress"]],
-                use_container_width=True,
-                hide_index=True,
-            )
+            overdue_df["EndDate"] = pd.to_datetime(overdue_df["EndDate"], errors="coerce").dt.strftime("%b %d")
+            overdue_df["Progress"] = overdue_df["Progress"].round(0).astype(int).astype(str) + "%"
+            st.dataframe(overdue_df[["Project", "Prototype", "Task", "OwnersLabel", "EndDate", "Status", "Progress"]], use_container_width=True, hide_index=True)
 
 with tab4:
     st.subheader("Tasks table")
     st.markdown('<div class="small-note">Clear table view of the filtered tasks. Use this as the operational list, then jump to the editor tab to update a specific task.</div>', unsafe_allow_html=True)
 
-    show_cols = [
-        "Project", "Prototype", "Stage", "Task", "OwnersLabel", "StartDate", "EndDate",
-        "DurationDays", "Status", "Progress", "Priority", "WeeklyUpdate", "Notes", "LabRequired"
-    ]
+    show_cols = ["Project", "Prototype", "Stage", "Task", "OwnersLabel", "StartDate", "EndDate", "DurationDays", "Status", "Progress", "Priority", "WeeklyUpdate", "Notes", "LabRequired"]
     table_df = filtered[show_cols].copy().rename(columns={"OwnersLabel": "Owners"})
+    table_df["StartDate"] = pd.to_datetime(table_df["StartDate"], errors="coerce").dt.strftime("%b %d")
+    table_df["EndDate"] = pd.to_datetime(table_df["EndDate"], errors="coerce").dt.strftime("%b %d")
+    table_df["Progress"] = table_df["Progress"].round(0).astype(int).astype(str) + "%"
     st.dataframe(table_df, use_container_width=True, hide_index=True)
 
     c1, c2 = st.columns(2)
@@ -609,7 +561,7 @@ with tab5:
             st.success("Task updated successfully.")
 
     st.markdown("### Add a manual mini-task")
-    with st.form("manual_task_form_v6"):
+    with st.form("manual_task_form_v7"):
         c1, c2, c3 = st.columns(3)
         project = c1.selectbox("Project", project_options)
         prototype = c2.selectbox("Prototype", prototype_options)
@@ -619,8 +571,8 @@ with tab5:
         task_name = st.text_input("Task name")
         owners = st.multiselect("Owners", people_options)
         d1, d2, d3 = st.columns(3)
-        start = d1.date_input("Start date", key="manual_start_v6")
-        end = d2.date_input("End date", key="manual_end_v6")
+        start = d1.date_input("Start date", key="manual_start_v7")
+        end = d2.date_input("End date", key="manual_end_v7")
         status = d3.selectbox("Initial status", STATUS_OPTIONS)
         weekly_update = st.text_input("Weekly update")
         notes = st.text_area("Notes")
@@ -663,14 +615,18 @@ with tab6:
         week_end = week_start + pd.Timedelta(days=6)
         week_tasks = report_df[(report_df["StartDate"] <= week_end) & (report_df["EndDate"] >= week_start)].copy()
         week_tasks["OwnersLabel"] = week_tasks["Owners"].apply(lambda x: ", ".join(x))
+        week_tasks["Progress"] = week_tasks["Progress"].round(0).astype(int).astype(str) + "%"
+        week_tasks["StartDate"] = pd.to_datetime(week_tasks["StartDate"], errors="coerce").dt.strftime("%b %d")
+        week_tasks["EndDate"] = pd.to_datetime(week_tasks["EndDate"], errors="coerce").dt.strftime("%b %d")
 
         k1, k2, k3 = st.columns(3)
         k1.metric("Active tasks", int(len(week_tasks)))
         k2.metric("Completed", int((week_tasks["Status"] == "Done").sum()))
-        k3.metric("Average progress", f"{round(week_tasks['Progress'].mean() if len(week_tasks) else 0, 1)}%")
+        k3.metric("Average progress", f"{round(report_df[(report_df['StartDate'] <= week_end) & (report_df['EndDate'] >= week_start)]['Progress'].mean() if len(week_tasks) else 0, 1)}%")
 
         st.dataframe(
-            week_tasks[["Project", "Prototype", "Task", "OwnersLabel", "Status", "Progress", "WeeklyUpdate", "Notes"]],
+            week_tasks[["Project", "Prototype", "Task", "OwnersLabel", "StartDate", "EndDate", "Status", "Progress", "WeeklyUpdate", "Notes"]],
             use_container_width=True,
             hide_index=True,
         )
+
