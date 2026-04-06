@@ -284,6 +284,20 @@ def fix_plotly_axes(fig):
     )
     return fig
 
+def render_plotly(container, fig, key: str):
+    container.plotly_chart(
+        fix_plotly_axes(fig),
+        use_container_width=True,
+        key=key,
+    )
+
+def build_week_df(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.dropna(subset=["StartDate", "EndDate"]).copy()
+    out["WeekStart"] = out["StartDate"].dt.to_period("W").apply(
+        lambda r: r.start_time if pd.notna(r) else pd.NaT
+    )
+    return out
+
 def make_styled_table(df, project_col=None, font_size="12px"):
     def row_style(row):
         if project_col and project_col in row.index:
@@ -336,7 +350,7 @@ tasks = load_tasks()
 tasks["OwnersLabel"] = tasks["Owners"].apply(lambda x: ", ".join(x))
 tasks["Overdue"] = tasks["EndDate"].notna() & (tasks["EndDate"] < pd.Timestamp.today().normalize()) & (tasks["Status"] != "Done")
 
-people_options = people_df["Person"].dropna().astype(str).tolist()
+people_options = sorted(people_df["Person"].dropna().astype(str).tolist()) if "Person" in people_df.columns else []
 project_options = sorted(tasks["Project"].dropna().astype(str).unique().tolist())
 prototype_options = sorted(tasks["Prototype"].dropna().astype(str).unique().tolist())
 
@@ -426,7 +440,7 @@ with tab1:
         for _, row in milestones.dropna(subset=["Date"]).iterrows():
             fig.add_vline(x=row["Date"], line_dash="dot", line_color="#94a3b8", opacity=0.7)
 
-        st.plotly_chart(fig, use_container_width=True)
+        render_plotly(st, fig, "master_timeline")
 
         c1, c2 = st.columns([1, 2])
         with c1:
@@ -451,17 +465,18 @@ with tab2:
     st.subheader("Roadmap by week")
     st.markdown('<div class="small-note">A cleaner product-style weekly roadmap so you can see what is happening each week without reading the full Gantt.</div>', unsafe_allow_html=True)
 
-    week_df = filtered.dropna(subset=["StartDate", "EndDate"]).copy()
+    week_df = build_week_df(filtered)
     if not week_df.empty:
-        week_df["WeekStart"] = week_df["StartDate"].dt.to_period("W").apply(lambda r: r.start_time if pd.notna(r) else pd.NaT)
-        roadmap_weeks = sorted(week_df["WeekStart"].dropna().unique().tolist())
+        roadmap_weeks = sorted(pd.to_datetime(week_df["WeekStart"].dropna().unique()))
 
         if roadmap_weeks:
-            week_labels = [pd.Timestamp(w).strftime("%b %d") for w in roadmap_weeks]
-            chosen_week = st.selectbox("Focus week", week_labels, index=0)
+            week_options = {wk.strftime("%b %d, %Y"): wk for wk in roadmap_weeks}
+            chosen_week_label = st.selectbox("Focus week", list(week_options.keys()), index=0)
+            chosen_week = pd.Timestamp(week_options[chosen_week_label])
 
             for wk in roadmap_weeks:
                 wk = pd.Timestamp(wk)
+                wk_str = wk.strftime("%Y-%m-%d")
                 wk_end = wk + pd.Timedelta(days=6)
                 wk_tasks = week_df[(week_df["StartDate"] <= wk_end) & (week_df["EndDate"] >= wk)].copy()
                 if wk_tasks.empty:
@@ -481,22 +496,22 @@ with tab2:
 
                 by_proj = wk_tasks.groupby("Project").size().reset_index(name="Tasks")
                 figp = px.bar(by_proj, x="Project", y="Tasks", text="Tasks", color="Project", color_discrete_map=PROJECT_COLORS, height=240)
-                figp.update_layout(margin=dict(l=10,r=10,t=20,b=10), showlegend=False, xaxis_title="", yaxis_title="")
+                figp.update_layout(margin=dict(l=10, r=10, t=20, b=10), showlegend=False, xaxis_title="", yaxis_title="")
                 figp.update_traces(textposition="outside")
-                col_a.plotly_chart(fix_plotly_axes(figp), use_container_width=True)
+                render_plotly(col_a, figp, f"roadmap_project_{wk_str}")
 
                 by_stat = wk_tasks.groupby("Status").size().reset_index(name="Tasks")
                 figs = px.bar(by_stat, x="Status", y="Tasks", text="Tasks", color="Status", color_discrete_map=STATUS_COLORS, height=240)
-                figs.update_layout(margin=dict(l=10,r=10,t=20,b=10), showlegend=False, xaxis_title="", yaxis_title="")
+                figs.update_layout(margin=dict(l=10, r=10, t=20, b=10), showlegend=False, xaxis_title="", yaxis_title="")
                 figs.update_traces(textposition="outside")
-                col_b.plotly_chart(fix_plotly_axes(figs), use_container_width=True)
+                render_plotly(col_b, figs, f"roadmap_status_{wk_str}")
 
                 wk_show = wk_tasks[["Project", "Prototype", "Task", "Status", "Progress"]].sort_values(["Project", "Prototype", "Task"]).copy()
                 wk_show["Progress"] = wk_show["Progress"].round(0).astype(int).astype(str) + "%"
                 col_c.table(make_styled_table(wk_show, project_col="Project", font_size="10px"))
 
             st.markdown("### Focus week details")
-            focus_start = pd.to_datetime(chosen_week + ", 2026", format="%b %d, %Y")
+            focus_start = chosen_week
             focus_end = focus_start + pd.Timedelta(days=6)
             focus_tasks = week_df[(week_df["StartDate"] <= focus_end) & (week_df["EndDate"] >= focus_start)].copy()
             focus_tasks["TaskLabel"] = focus_tasks.apply(lambda r: f"{r['Prototype']} • {r['Task']}", axis=1)
@@ -513,7 +528,7 @@ with tab2:
                     height=max(400, 28 * len(focus_tasks) + 120),
                 )
                 fig_focus.update_layout(xaxis_title="Progress (%)", yaxis_title="", legend_title_text="Status")
-                st.plotly_chart(fix_plotly_axes(fig_focus), use_container_width=True)
+                render_plotly(st, fig_focus, f"focus_week_progress_{focus_start.strftime('%Y-%m-%d')}")
 
 with tab3:
     st.subheader("Dashboard")
@@ -524,13 +539,13 @@ with tab3:
         fig1 = px.bar(by_status, x="Status", y="Count", text="Count", color="Status", color_discrete_map=STATUS_COLORS, title="Tasks by status")
         fig1.update_layout(xaxis_title="", yaxis_title="Tasks")
         fig1.update_traces(textposition="outside")
-        left.plotly_chart(fix_plotly_axes(fig1), use_container_width=True)
+        render_plotly(left, fig1, "dashboard_status")
 
         by_project = filtered.groupby("Project", dropna=False)["Progress"].mean().reset_index().sort_values("Progress", ascending=True)
         fig2 = px.bar(by_project, x="Progress", y="Project", orientation="h", text="Progress", color="Project", color_discrete_map=PROJECT_COLORS, title="Average progress by project")
         fig2.update_layout(yaxis_title="", xaxis_title="Average progress (%)", showlegend=False)
         fig2.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-        right.plotly_chart(fix_plotly_axes(fig2), use_container_width=True)
+        render_plotly(right, fig2, "dashboard_project_progress")
 
         a, b = st.columns(2)
 
@@ -538,7 +553,7 @@ with tab3:
         fig3 = px.bar(by_proto, x="Progress", y="Prototype", orientation="h", text="Progress", color="Prototype", color_discrete_sequence=CHART_PALETTE, title="Average progress by prototype")
         fig3.update_layout(yaxis_title="", xaxis_title="Average progress (%)", showlegend=False)
         fig3.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-        a.plotly_chart(fix_plotly_axes(fig3), use_container_width=True)
+        render_plotly(a, fig3, "dashboard_prototype_progress")
 
         owner_load = filtered.explode("Owners")
         owner_load = owner_load[owner_load["Owners"].notna() & (owner_load["Owners"] != "")]
@@ -546,7 +561,7 @@ with tab3:
         fig4 = px.bar(owner_summary, x="Tasks", y="Owners", orientation="h", text="Tasks", color="Owners", color_discrete_sequence=CHART_PALETTE, title="Task load by owner")
         fig4.update_layout(yaxis_title="", xaxis_title="Tasks", showlegend=False)
         fig4.update_traces(textposition="outside")
-        b.plotly_chart(fix_plotly_axes(fig4), use_container_width=True)
+        render_plotly(b, fig4, "dashboard_owner_load")
 
         overdue_df = filtered[filtered["Overdue"]].copy()
         st.markdown("**Overdue tasks**")
